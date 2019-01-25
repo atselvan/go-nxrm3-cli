@@ -12,10 +12,17 @@ func ListScripts(){
 	for _, s := range scriptsList {
 		fmt.Println(s)
 	}
-	fmt.Printf("No of scripts in nexus : %d\n", len(scriptsList))
+	if len(scriptsList) == 0 {
+		fmt.Println("There are no scripts available in nexus")
+	} else {
+		fmt.Printf("No of scripts in nexus : %d\n", len(scriptsList))
+	}
 }
 
 func AddOrUpdateScript(scriptName string){
+	if scriptName == "" {
+		log.Fatal("Add/Update Script Error : scriptName is a required parameter")
+	}
 	if !scriptExists(scriptName){
 		AddScript(scriptName)
 	} else {
@@ -24,6 +31,9 @@ func AddOrUpdateScript(scriptName string){
 }
 
 func AddScript(scriptName string){
+	if scriptName == "" {
+		log.Fatal("Add Script Error : scriptName is a required parameter")
+	}
 	url := fmt.Sprintf("%s/%s/%s", NexusURL, apiBase, scriptAPI)
 	if !scriptExists(scriptName) {
 		payload, err := json.Marshal(m.Script{Name: scriptName, Type: "groovy", Content: readFile(getScriptPath(scriptName))})
@@ -41,6 +51,9 @@ func AddScript(scriptName string){
 }
 
 func UpdateScript(scriptName string){
+	if scriptName == "" {
+		log.Fatal("Update Script Error : scriptName is a required parameter")
+	}
 	url := fmt.Sprintf("%s/%s/%s/%s", NexusURL, apiBase, scriptAPI, scriptName)
 	if scriptExists(scriptName) {
 		payload, err := json.Marshal(m.Script{Name: scriptName, Type: "groovy", Content: readFile(getScriptPath(scriptName))})
@@ -58,6 +71,9 @@ func UpdateScript(scriptName string){
 }
 
 func DeleteScript(scriptName string){
+	if scriptName == "" {
+		log.Fatal("Delete Script Error : scriptName is a required parameter")
+	}
 	url := fmt.Sprintf("%s/%s/%s/%s", NexusURL, apiBase, scriptAPI, scriptName)
 	if scriptExists(scriptName) {
 		payload, err := json.Marshal(m.Script{Name: scriptName, Type: "groovy", Content: readFile(getScriptPath(scriptName))})
@@ -75,6 +91,9 @@ func DeleteScript(scriptName string){
 }
 
 func RunScript(scriptName, payload string) []byte{
+	if scriptName == "" {
+		log.Fatal("Run Script Error : scriptName is a required parameter")
+	}
 	AddOrUpdateScript(scriptName)
 	url := fmt.Sprintf("%s/%s/%s/%s/run", NexusURL, apiBase, scriptAPI, scriptName)
 	req := createBaseRequest1("POST", url, payload)
@@ -107,6 +126,9 @@ func getScripts() []string{
 }
 
 func GetScript(scriptName string) m.Script{
+	if scriptName == "" {
+		log.Fatal("Get Script Error : scriptName is a required parameter")
+	}
 	var (
 		url = fmt.Sprintf("%s/%s/%s/%s", NexusURL, apiBase, scriptAPI, scriptName)
 		script m.Script
@@ -122,10 +144,16 @@ func GetScript(scriptName string) m.Script{
 } 
 
 func getScriptPath(scriptName string) string{
+	if scriptName == "" {
+		log.Fatal("Get Script Path Error : scriptName is a required parameter")
+	}
 	return fmt.Sprintf("%s/%s.groovy", scriptBasePath, scriptName)
 }
 
 func scriptExists(scriptName string) bool{
+	if scriptName == "" {
+		log.Fatal("Script Exists Error : scriptName is a required parameter")
+	}
 	url := fmt.Sprintf("%s/%s/%s/%s", NexusURL, apiBase, scriptAPI, scriptName)
 	req := createBaseRequest("GET", url, nil)
 	_, status := httpRequest(req)
