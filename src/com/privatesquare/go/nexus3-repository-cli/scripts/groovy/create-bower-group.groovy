@@ -1,0 +1,1 @@
+repository.createBowerGroup('bower-all',['bower-io','bower-internal'])
