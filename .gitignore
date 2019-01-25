@@ -1,2 +1,10 @@
+
+# IDE
 **.iml
+.idea/
+
+# Mac filesystem
 **.DS_Store
+
+# Maven target
+target/

@@ -1,14 +1,16 @@
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
+import org.sonatype.nexus.repository.maven.LayoutPolicy
+import org.sonatype.nexus.repository.maven.VersionPolicy
 import org.sonatype.nexus.repository.storage.WritePolicy
 
-def output = [:]
 def input = new JsonSlurper().parseText(args)
+def output = [:]
 
 def isExists = repository.getRepositoryManager().get(input.name)
 
 if (!isExists) {
-    def repo = repository.createMavenHosted(input.name, "default", true, VersionPolicy.SNAPSHOTS, WritePolicy.ALLOW, LayoutPolicy.STRICT)
+    def repo = repository.createMavenHosted(input.name, "default", true, VersionPolicy.SNAPSHOT, WritePolicy.ALLOW, LayoutPolicy.STRICT)
     output.put("status", "200")
     output.put("name", repo.name)
     output.put("url", repo.url)
