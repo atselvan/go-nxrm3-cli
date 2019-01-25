@@ -32,6 +32,8 @@ func AddScript(scriptName string){
 		_, status := httpRequest(req)
 		if status == "204 No Content" {
 			log.Printf("Added the script %q in nexus\n", scriptName)
+		} else {
+			log.Printf("Add Script Error : Set verbose flag for more information")
 		}
 	} else {
 		log.Printf("Script %q already exists in nexus\n", scriptName)
@@ -47,6 +49,8 @@ func UpdateScript(scriptName string){
 		_, status := httpRequest(req)
 		if status == "204 No Content" {
 			log.Printf("Updated the script %q in nexus\n", scriptName)
+		} else {
+			log.Printf("Update Script Error : Set verbose flag for more information")
 		}
 	} else {
 		log.Printf("Script %q does not exists in nexus\n", scriptName)
@@ -62,24 +66,25 @@ func DeleteScript(scriptName string){
 		_, status := httpRequest(req)
 		if status == "204 No Content" {
 			log.Printf("Deleted the script %q from nexus\n", scriptName)
+		} else {
+			log.Printf("Delete Script Error : Set verbose flag for more information")
 		}
 	} else {
 		log.Printf("Script %q does not exists in nexus\n", scriptName)
 	}
 }
 
-func RunScript(scriptName string){
+func RunScript(scriptName, payload string) []byte{
+	AddOrUpdateScript(scriptName)
 	url := fmt.Sprintf("%s/%s/%s/%s/run", NexusURL, apiBase, scriptAPI, scriptName)
-
-	payload := `{
-    			"name": "test-repo-10"
-				}`
-	
-	postreq := createBaseRequest1("POST", url, payload)
-
-	respBody, status := httpRequest(postreq)
-
-	fmt.Println(string(respBody), status)
+	req := createBaseRequest1("POST", url, payload)
+	respBody, status := httpRequest(req)
+	if status == "200 OK"{
+		log.Printf("Script %q was executed successfully\n", scriptName)
+	} else {
+		log.Printf("Run Script Error : Set verbose flag for more information")
+	}
+	return respBody
 }
 
 func getScripts() []string{
@@ -96,7 +101,7 @@ func getScripts() []string{
 		scriptsList = append(scriptsList, s.Name)
 	}
 	if status != "200 OK"{
-		log.Fatal("Get Scripts : Error getting scripts list. Set verbose for more information")
+		log.Fatal("Get Scripts Error : Set verbose flag for more information")
 	}
 	return scriptsList
 }
@@ -111,7 +116,7 @@ func GetScript(scriptName string) m.Script{
 	err := json.Unmarshal(respBody, &script)
 	logError(err, "Get Script : JSON Unmarshal error")
 	if status != "200 OK"{
-		log.Fatal("Get Script : Error getting the script. Set verbose for more information")
+		log.Fatal("Get Script Error : Set verbose flag for more information")
 	}
 	return script
 } 
