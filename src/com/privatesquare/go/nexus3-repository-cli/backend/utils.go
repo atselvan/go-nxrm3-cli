@@ -2,12 +2,14 @@ package backend
 
 import (
 	"bytes"
+	"com/privatesquare/go/nexus3-repository-cli/model"
 	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"runtime"
 	"strings"
 )
 
@@ -23,6 +25,20 @@ func logError(err error, errorMessage string) {
 	}
 }
 
+func logJsonMarshalError(err error, funcName string) {
+	if err != nil {
+		log.Println(fmt.Sprintf("%s : %s", funcName, jsonMarshalError))
+		os.Exit(1)
+	}
+}
+
+func logJsonUnmarshalError(err error, funcName string) {
+	if err != nil {
+		log.Println(fmt.Sprintf("%s : %s", funcName, jsonUnmarshalError))
+		os.Exit(1)
+	}
+}
+
 /*
 createBaseRequest create the base request for a HTTP request
 @param method   string          http request method eg: GET, POST, etc
@@ -32,40 +48,33 @@ createBaseRequest create the base request for a HTTP request
 @param verbose  boolean         prints verbose logs if set to true
 @return *http.Request   HTTP base request
 */
-func createBaseRequest(method, url string, body []byte) *http.Request {
+func createBaseRequest(method, url string, requestBody model.RequestBody) *http.Request {
 	if SkipTLSVerification {
 		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
-	req, err := http.NewRequest(method, url, bytes.NewBuffer(body))
+	var (
+		req *http.Request
+		err error
+	)
+	if requestBody.Json != nil {
+		req, err = http.NewRequest(method, url, bytes.NewBuffer(requestBody.Json))
+		logError(err, "Error creating the request")
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Accept", "application/json")
+	} else if requestBody.Text != "" {
+		req, err = http.NewRequest(method, url, strings.NewReader(requestBody.Text))
+		req.Header.Set("Content-Type", "text/plain")
+		logError(err, "Error creating the request")
+	} else {
+		req, err = http.NewRequest(method, url, nil)
+		logError(err, "Error creating the request")
+	}
 	req.SetBasicAuth(AuthUser.Username, AuthUser.Password)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Accept", "application/json")
-	logError(err, "Error creating the request")
-
 	if Verbose {
 		fmt.Println("Request Url:", req.URL)
 		fmt.Println("Request Headers:", req.Header)
 		fmt.Println("Request Body:", req.Body)
 	}
-
-	return req
-}
-
-func createBaseRequest1(method, url string, body string) *http.Request {
-	if SkipTLSVerification {
-		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	}
-	req, err := http.NewRequest(method, url, strings.NewReader(body))
-	req.SetBasicAuth(AuthUser.Username, AuthUser.Password)
-	req.Header.Set("Content-Type", "text/plain")
-	logError(err, "Error creating the request")
-
-	if Verbose {
-		fmt.Println("Request Url:", req.URL)
-		fmt.Println("Request Headers:", req.Header)
-		fmt.Println("Request Body:", req.Body)
-	}
-
 	return req
 }
 
@@ -103,14 +112,32 @@ func fileExists(fileName string) bool {
 	return true
 }
 
-func readFile(fileName string) string{
+func readFile(fileName string) string {
 	var (
 		data []byte
-		err error
+		err  error
 	)
 	if fileExists(fileName) {
 		data, err = ioutil.ReadFile(fileName)
 		logError(err, "There was an error reading the file")
+	} else {
+		log.Printf("File %q was not found", fileName)
+		os.Exit(1)
+	}
+	if string(data) == "" {
+		log.Printf("The file %q is empty", fileName)
+		os.Exit(1)
 	}
 	return string(data)
+}
+
+func printStringSlice(slice []string) {
+	for _, s := range slice {
+		fmt.Println(s)
+	}
+}
+
+func getfuncName() string {
+	pc, _, _, _ := runtime.Caller(1)
+	return runtime.FuncForPC(pc).Name()
 }

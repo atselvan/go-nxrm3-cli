@@ -5,159 +5,195 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
+	"sort"
 )
 
-func ListScripts(){
-	scriptsList := getScripts()
-	for _, s := range scriptsList {
-		fmt.Println(s)
-	}
-	if len(scriptsList) == 0 {
-		fmt.Println("There are no scripts available in nexus")
+func ListScripts(scriptName string) {
+	if scriptName != "" {
+		script := getScript(scriptName)
+		fmt.Println(script)
 	} else {
-		fmt.Printf("No of scripts in nexus : %d\n", len(scriptsList))
+		scriptsList := getScripts()
+		sort.Strings(scriptsList)
+		printStringSlice(scriptsList)
+		if len(scriptsList) == 0 {
+			fmt.Println("There are no scripts available in nexus")
+		} else {
+			fmt.Printf("No of scripts in nexus : %d\n", len(scriptsList))
+		}
 	}
 }
 
-func AddOrUpdateScript(scriptName string){
+func AddOrUpdateScript(scriptName string) {
 	if scriptName == "" {
-		log.Fatal("Add/Update Script Error : scriptName is a required parameter")
+		log.Printf("%s : %s", getfuncName(), scriptNameRequiredInfo)
+		os.Exit(1)
 	}
-	if !scriptExists(scriptName){
+	if !scriptExists(scriptName) {
 		AddScript(scriptName)
 	} else {
 		UpdateScript(scriptName)
 	}
 }
 
-func AddScript(scriptName string){
+func AddScript(scriptName string) {
 	if scriptName == "" {
-		log.Fatal("Add Script Error : scriptName is a required parameter")
+		log.Printf("%s : %s", getfuncName(), scriptNameRequiredInfo)
+		os.Exit(1)
 	}
 	url := fmt.Sprintf("%s/%s/%s", NexusURL, apiBase, scriptAPI)
 	if !scriptExists(scriptName) {
 		payload, err := json.Marshal(m.Script{Name: scriptName, Type: "groovy", Content: readFile(getScriptPath(scriptName))})
-		logError(err, "Add Script : Json Marshal Error")
-		req := createBaseRequest("POST", url, payload)
+		logJsonMarshalError(err, getfuncName())
+		req := createBaseRequest("POST", url, m.RequestBody{Json: payload})
 		_, status := httpRequest(req)
 		if status == "204 No Content" {
-			log.Printf("Added the script %q in nexus\n", scriptName)
+			if Debug {
+				log.Printf("The script %q is added to nexus\n", scriptName)
+			}
 		} else {
-			log.Printf("Add Script Error : Set verbose flag for more information")
+			log.Printf("%s : %s", getfuncName(), setVerboseInfo)
+			os.Exit(1)
 		}
 	} else {
-		log.Printf("Script %q already exists in nexus\n", scriptName)
+		log.Printf("The script %q already exists in nexus\n", scriptName)
 	}
 }
 
-func UpdateScript(scriptName string){
+func UpdateScript(scriptName string) {
 	if scriptName == "" {
-		log.Fatal("Update Script Error : scriptName is a required parameter")
+		log.Printf("%s : %s", getfuncName(), scriptNameRequiredInfo)
+		os.Exit(1)
 	}
 	url := fmt.Sprintf("%s/%s/%s/%s", NexusURL, apiBase, scriptAPI, scriptName)
 	if scriptExists(scriptName) {
 		payload, err := json.Marshal(m.Script{Name: scriptName, Type: "groovy", Content: readFile(getScriptPath(scriptName))})
-		logError(err, "Update Script : Json Marshal Error")
-		req := createBaseRequest("PUT", url, payload)
+		logJsonMarshalError(err, getfuncName())
+		req := createBaseRequest("PUT", url, m.RequestBody{Json: payload})
 		_, status := httpRequest(req)
 		if status == "204 No Content" {
-			log.Printf("Updated the script %q in nexus\n", scriptName)
+			if Debug {
+				log.Printf("The script %q is updated in nexus\n", scriptName)
+			}
 		} else {
-			log.Printf("Update Script Error : Set verbose flag for more information")
+			log.Printf("%s : %s", getfuncName(), setVerboseInfo)
+			os.Exit(1)
 		}
 	} else {
-		log.Printf("Script %q does not exists in nexus\n", scriptName)
+		log.Printf("The script %q does not exists in nexus\n", scriptName)
 	}
 }
 
-func DeleteScript(scriptName string){
+func DeleteScript(scriptName string) {
 	if scriptName == "" {
-		log.Fatal("Delete Script Error : scriptName is a required parameter")
+		log.Printf("%s : %s", getfuncName(), scriptNameRequiredInfo)
+		os.Exit(1)
 	}
 	url := fmt.Sprintf("%s/%s/%s/%s", NexusURL, apiBase, scriptAPI, scriptName)
 	if scriptExists(scriptName) {
 		payload, err := json.Marshal(m.Script{Name: scriptName, Type: "groovy", Content: readFile(getScriptPath(scriptName))})
-		logError(err, "Delete Script : Json Marshal Error")
-		req := createBaseRequest("Delete", url, payload)
+		logJsonMarshalError(err, getfuncName())
+		req := createBaseRequest("Delete", url, m.RequestBody{Json: payload})
 		_, status := httpRequest(req)
 		if status == "204 No Content" {
-			log.Printf("Deleted the script %q from nexus\n", scriptName)
+			if Debug {
+				log.Printf("The script %q is deleted from nexus\n", scriptName)
+			}
 		} else {
-			log.Printf("Delete Script Error : Set verbose flag for more information")
+			log.Printf("%s : %s", getfuncName(), setVerboseInfo)
+			os.Exit(1)
 		}
 	} else {
-		log.Printf("Script %q does not exists in nexus\n", scriptName)
+		log.Printf("The script %q does not exists in nexus\n", scriptName)
 	}
 }
 
-func RunScript(scriptName, payload string) []byte{
+func RunScript(scriptName, payload string) m.ScriptResult {
 	if scriptName == "" {
-		log.Fatal("Run Script Error : scriptName is a required parameter")
+		log.Printf("%s : %s", getfuncName(), scriptNameRequiredInfo)
+		os.Exit(1)
 	}
+	var (
+		output m.ScriptOutput
+		result m.ScriptResult
+	)
 	AddOrUpdateScript(scriptName)
 	url := fmt.Sprintf("%s/%s/%s/%s/run", NexusURL, apiBase, scriptAPI, scriptName)
-	req := createBaseRequest1("POST", url, payload)
+	req := createBaseRequest("POST", url, m.RequestBody{Text: payload})
 	respBody, status := httpRequest(req)
-	if status == "200 OK"{
-		log.Printf("Script %q was executed successfully\n", scriptName)
+	if status == "200 OK" {
+		if Debug {
+			log.Printf("The script %q was executed successfully\n", scriptName)
+		}
 	} else {
-		log.Printf("Run Script Error : Set verbose flag for more information")
+		log.Printf("%s : %s", getfuncName(), setVerboseInfo)
+		os.Exit(1)
 	}
-	return respBody
+	err := json.Unmarshal(respBody, &output)
+	logJsonUnmarshalError(err, getfuncName())
+	err = json.Unmarshal([]byte(output.Result), &result)
+	logJsonUnmarshalError(err, getfuncName())
+	return result
 }
 
-func getScripts() []string{
+func getScripts() []string {
 	var (
-		url = fmt.Sprintf("%s/%s/%s", NexusURL, apiBase, scriptAPI)
-		scripts []m.Script
+		url         = fmt.Sprintf("%s/%s/%s", NexusURL, apiBase, scriptAPI)
+		scripts     []m.Script
 		scriptsList []string
 	)
-	req := createBaseRequest("GET", url, nil)
+	req := createBaseRequest("GET", url, m.RequestBody{})
 	respBody, status := httpRequest(req)
 	err := json.Unmarshal(respBody, &scripts)
-	logError(err, "Get Scripts : JSON Unmarshal error")
-	for _, s := range scripts{
+	logJsonUnmarshalError(err, getfuncName())
+	for _, s := range scripts {
 		scriptsList = append(scriptsList, s.Name)
 	}
-	if status != "200 OK"{
-		log.Fatal("Get Scripts Error : Set verbose flag for more information")
+	if status != "200 OK" {
+		log.Printf("%s : %s", getfuncName(), setVerboseInfo)
+		os.Exit(1)
 	}
 	return scriptsList
 }
 
-func GetScript(scriptName string) m.Script{
+func getScript(scriptName string) m.Script {
 	if scriptName == "" {
-		log.Fatal("Get Script Error : scriptName is a required parameter")
+		log.Printf("%s : %s", getfuncName(), scriptNameRequiredInfo)
+		os.Exit(1)
 	}
 	var (
-		url = fmt.Sprintf("%s/%s/%s/%s", NexusURL, apiBase, scriptAPI, scriptName)
+		url    = fmt.Sprintf("%s/%s/%s/%s", NexusURL, apiBase, scriptAPI, scriptName)
 		script m.Script
 	)
-	req := createBaseRequest("GET", url, nil)
+	req := createBaseRequest("GET", url, m.RequestBody{})
 	respBody, status := httpRequest(req)
 	err := json.Unmarshal(respBody, &script)
-	logError(err, "Get Script : JSON Unmarshal error")
-	if status != "200 OK"{
-		log.Fatal("Get Script Error : Set verbose flag for more information")
+	logJsonUnmarshalError(err, getfuncName())
+	if status != "200 OK" {
+		log.Printf("%s : %s", getfuncName(), setVerboseInfo)
+		os.Exit(1)
 	}
 	return script
-} 
+}
 
-func getScriptPath(scriptName string) string{
+func getScriptPath(scriptName string) string {
 	if scriptName == "" {
-		log.Fatal("Get Script Path Error : scriptName is a required parameter")
+		log.Printf("%s : %s", getfuncName(), scriptNameRequiredInfo)
+		os.Exit(1)
 	}
 	return fmt.Sprintf("%s/%s.groovy", scriptBasePath, scriptName)
 }
 
-func scriptExists(scriptName string) bool{
+func scriptExists(scriptName string) bool {
 	if scriptName == "" {
-		log.Fatal("Script Exists Error : scriptName is a required parameter")
+		log.Printf("%s : %s", getfuncName(), scriptNameRequiredInfo)
+		os.Exit(1)
 	}
 	url := fmt.Sprintf("%s/%s/%s/%s", NexusURL, apiBase, scriptAPI, scriptName)
-	req := createBaseRequest("GET", url, nil)
+	req := createBaseRequest("GET", url, m.RequestBody{})
 	_, status := httpRequest(req)
-	if status == "200 OK"{
+	if status == "200 OK" {
 		return true
 	}
 	return false
