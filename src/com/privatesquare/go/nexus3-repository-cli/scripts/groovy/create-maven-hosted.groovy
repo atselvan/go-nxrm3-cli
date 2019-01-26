@@ -6,20 +6,19 @@ import org.sonatype.nexus.repository.storage.WritePolicy
 
 def input = new JsonSlurper().parseText(args)
 def output = [:]
+def repo
 
-def isExists = repository.getRepositoryManager().get(input.name)
-
-if (!isExists) {
-    def repo = repository.createMavenHosted(input.name, "default", true, VersionPolicy.SNAPSHOT, WritePolicy.ALLOW, LayoutPolicy.STRICT)
-    output.put("status", "200")
+if (!repository.getRepositoryManager().exists(input.name)){
+    if (input.versionPolicy == "release"){
+        repo = repository.createMavenHosted(input.name, input.blobStoreName, true, VersionPolicy.RELEASE, WritePolicy.ALLOW_ONCE, LayoutPolicy.STRICT)
+    } else {
+        repo = repository.createMavenHosted(input.name, input.blobStoreName, true, VersionPolicy.SNAPSHOT, WritePolicy.ALLOW, LayoutPolicy.STRICT)
+    }
+    output.put("status", "200 OK")
     output.put("name", repo.name)
     output.put("url", repo.url)
-    output.put("type", repo.type.value)
-    output.put("format", repo.format.value)
-    output.put("recipe", repo.configuration.recipeName)
 } else {
-    output.put("status", "409")
-    output.put("message", "Repository already exists!")
+    output.put("status", "302 Found")
 }
 
 return JsonOutput.toJson(output)
