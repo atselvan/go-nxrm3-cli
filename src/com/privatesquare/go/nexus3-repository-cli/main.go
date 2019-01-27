@@ -46,6 +46,11 @@ func main() {
 
 	flag.Parse()
 
+	if len(os.Args) < 2{
+		flag.Usage()
+		os.Exit(1)
+	}
+
 	switch os.Args[1] {
 	case "configure":
 		b.ConfigureCommandUsage(confCommand)
