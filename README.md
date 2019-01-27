@@ -42,7 +42,7 @@ nexus3-repository-cli configure -nexus-url http://localhost:8081 -username admin
 
 ### script sub-command
 
-```configure
+```console
 Usage: nexus3-repository-cli script [args] [options]
 
 [args]
@@ -64,7 +64,7 @@ Usage: nexus3-repository-cli script [args] [options]
 
 ### repo sub-command
 
-```configure
+```console
 Usage: nexus3-repository-cli repo [args] [options]
 
 [args]
