@@ -15,7 +15,10 @@ const (
 	jsonUnmarshalError = "JSON Unmarshal Error"
 
 	// Info Strings
-	scriptNameRequiredInfo = "scriptName is a required parameter"
-	repoNameRequiredInfo   = "repoName is a required parameter"
-	setVerboseInfo         = "There was an error calling the function. Set verbose flag for more information"
+	scriptNameRequiredInfo      = "script-name is a required parameter"
+	repoNameRequiredInfo        = "repo-name is a required parameter"
+	mavenHostedRepoRequiredInfo = "repo-name is a required parameter"
+	proxyRepoRequiredInfo       = "repo-name and remote-url are required parameters"
+	groupRequiredInfo           = "repo-name and repo-members are required parameters"
+	setVerboseInfo              = "There was an error calling the function. Set verbose flag for more information"
 )

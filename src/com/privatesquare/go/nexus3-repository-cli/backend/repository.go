@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 )
 
 func ListRepositories(repoName, repoFormat string) {
@@ -27,7 +28,7 @@ func ListRepositories(repoName, repoFormat string) {
 
 func CreateMavenHostedRepository(repoName, blobStoreName string, release bool) {
 	if repoName == "" {
-		log.Printf("%s : %s", getfuncName(), repoNameRequiredInfo)
+		log.Printf("%s : %s", getfuncName(), mavenHostedRepoRequiredInfo)
 		os.Exit(1)
 	}
 	payload, err := json.Marshal(m.Repository{Name: repoName, BlobStoreName: getBlobStoreName(blobStoreName), VersionPolicy: getVersionPolicy(release)})
@@ -36,23 +37,29 @@ func CreateMavenHostedRepository(repoName, blobStoreName string, release bool) {
 	printCreateRepoStatus(repoName, result.Status)
 }
 
-func CreateMavenProxyRepository(repoName, blobStoreName, remoteUrl string) {
-	if repoName == "" {
-		log.Printf("%s : %s", getfuncName(), repoNameRequiredInfo)
+func CreateMavenProxyRepository(repoName, blobStoreName, remoteURL string) {
+	if repoName == "" || remoteURL == "" {
+		log.Printf("%s : %s", getfuncName(), proxyRepoRequiredInfo)
 		os.Exit(1)
 	}
-	payload, err := json.Marshal(m.Repository{Name: repoName, RemoteURL: remoteUrl, BlobStoreName: getBlobStoreName(blobStoreName)})
+	payload, err := json.Marshal(m.Repository{Name: repoName, RemoteURL: remoteURL, BlobStoreName: getBlobStoreName(blobStoreName)})
 	logJsonMarshalError(err, getfuncName())
 	result := RunScript("create-maven-proxy", string(payload))
 	printCreateRepoStatus(repoName, result.Status)
 }
 
-func CreateMavenGroupRepository(repoName, blobStoreName string, repoMembers []string) {
-	if repoName == "" {
-		log.Printf("%s : %s", getfuncName(), repoNameRequiredInfo)
+func CreateMavenGroupRepository(repoName, blobStoreName string, repoMembers string) {
+	if repoName == "" || repoMembers == "" {
+		log.Printf("%s : %s", getfuncName(), groupRequiredInfo)
 		os.Exit(1)
 	}
-	payload, err := json.Marshal(m.Repository{Name: repoName, Members: repoMembers, BlobStoreName: getBlobStoreName(blobStoreName)})
+	for _, r := range strings.Split(repoMembers, ",") {
+		if !repositoryExists(r) {
+			log.Printf("Repository %q does not exist in nexus. Please check the repo-members value and try again\n", r)
+			os.Exit(1)
+		}
+	}
+	payload, err := json.Marshal(m.Repository{Name: repoName, Members: strings.Split(repoMembers, ","), BlobStoreName: getBlobStoreName(blobStoreName)})
 	logJsonMarshalError(err, getfuncName())
 	result := RunScript("create-maven-group", string(payload))
 	printCreateRepoStatus(repoName, result.Status)
@@ -107,6 +114,26 @@ func getRepositoryList() []string {
 	return repositoryList
 }
 
+func repositoryExists(repoName string) bool {
+	if repoName == "" {
+		log.Printf("%s : %s", getfuncName(), repoNameRequiredInfo)
+		os.Exit(1)
+	}
+	var isExists bool
+	payload, err := json.Marshal(m.Repository{Name: repoName})
+	logJsonMarshalError(err, getfuncName())
+	result := RunScript("get-repo", string(payload))
+	if result.Status == "200 OK" {
+		isExists = true
+	} else if result.Status == "404 Not Found" {
+		isExists = false
+	} else {
+		log.Printf("%s : %s", getfuncName(), setVerboseInfo)
+		os.Exit(1)
+	}
+	return isExists
+}
+
 func getRepositoryListByFormat(repoFormat string) []string {
 	var repositoryList []string
 	repositories := getRepositories()
@@ -137,9 +164,9 @@ func getVersionPolicy(release bool) string {
 
 func printCreateRepoStatus(repoName, status string) {
 	if status == "200 OK" {
-		log.Printf("Repository %s was created\n", repoName)
+		log.Printf("Repository %s was created in nexus\n", repoName)
 	} else if status == "302 Found" {
-		log.Printf("Repository %s already exists\n", repoName)
+		log.Printf("Repository %s already exists in nexus\n", repoName)
 	} else {
 		log.Printf("Error creating repository : %s\n", setVerboseInfo)
 	}
@@ -147,9 +174,9 @@ func printCreateRepoStatus(repoName, status string) {
 
 func printDeleteRepoStatus(repoName, status string) {
 	if status == "200 OK" {
-		fmt.Printf("Repository %q was deleted\n", repoName)
+		log.Printf("Repository %q was deleted from nexus\n", repoName)
 	} else if status == "404 Not Found" {
-		fmt.Printf("Repository %q was not found\n", repoName)
+		log.Printf("Repository %q was not found in nexus\n", repoName)
 	} else {
 		log.Printf("Error deleting repository : %s\n", setVerboseInfo)
 	}

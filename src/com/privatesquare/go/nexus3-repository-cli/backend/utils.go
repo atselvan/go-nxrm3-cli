@@ -119,7 +119,7 @@ func readFile(fileName string) string {
 	)
 	if fileExists(fileName) {
 		data, err = ioutil.ReadFile(fileName)
-		logError(err, "There was an error reading the file")
+		logError(err, "There was an error reading the file.")
 	} else {
 		log.Printf("File %q was not found", fileName)
 		os.Exit(1)
@@ -129,6 +129,11 @@ func readFile(fileName string) string {
 		os.Exit(1)
 	}
 	return string(data)
+}
+
+func writeFile(fileName string, data []byte) {
+	err := ioutil.WriteFile(fileName, data, 0644)
+	logError(err, "There was an error writing to the file.")
 }
 
 func printStringSlice(slice []string) {

@@ -168,9 +168,13 @@ func getScript(scriptName string) m.Script {
 	)
 	req := createBaseRequest("GET", url, m.RequestBody{})
 	respBody, status := httpRequest(req)
-	err := json.Unmarshal(respBody, &script)
-	logJsonUnmarshalError(err, getfuncName())
-	if status != "200 OK" {
+	if status == "200 OK" {
+		err := json.Unmarshal(respBody, &script)
+		logJsonUnmarshalError(err, getfuncName())
+	} else if status == "404 Not Found" {
+		log.Printf("The script %q does not exist\n", scriptName)
+		os.Exit(1)
+	} else {
 		log.Printf("%s : %s", getfuncName(), setVerboseInfo)
 		os.Exit(1)
 	}
