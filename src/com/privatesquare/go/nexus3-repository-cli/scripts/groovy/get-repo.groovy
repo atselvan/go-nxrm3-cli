@@ -6,7 +6,7 @@ def repo = repository.getRepositoryManager().get(input.name)
 
 def output = [:]
 
-if (repo.name != null){
+if (repository.getRepositoryManager().exists(input.name)){
     output.put("status", "200 OK")
     output.put("name", repo.name)
     output.put("url", repo.url)
