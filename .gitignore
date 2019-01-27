@@ -8,3 +8,6 @@
 
 # Maven target
 target/
+
+# cli executables
+src/com/privatesquare/go/nexus3-repository-cli/nexus3-repository-cli*
