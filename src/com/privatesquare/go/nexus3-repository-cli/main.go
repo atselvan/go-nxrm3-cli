@@ -13,8 +13,6 @@ func main() {
 
 	//TODO : Explain the script and repo tasks
 
-	var skipTLS, debug, verbose *bool
-
 	// subcommands
 	confCommand := flag.NewFlagSet("configure", flag.ExitOnError)
 	scriptCommand := flag.NewFlagSet("script", flag.ExitOnError)
@@ -27,9 +25,9 @@ func main() {
 	scriptTask := scriptCommand.String("task", "", "Script Task (list|add|update|add-or-update|delete|run). (Required)")
 	scriptName := scriptCommand.String("script-name", "", "Name of the script to be executed in nexus. \nThe script should exist under the path ./scripts/groovy")
 	scriptPayload := scriptCommand.String("payload", "", "Arguments to be passed to a nexus script can be sent as a payload during script execution.")
-	skipTLS = scriptCommand.Bool("skip-tls", false, "Skip TLS verification for the nexus server instance.")
-	debug = scriptCommand.Bool("debug", false, "Set Default for more information on the nexus script execution.")
-	verbose = scriptCommand.Bool("verbose", false, "Set Verbose for detailed http request and response logs.")
+	scSkipTLS := scriptCommand.Bool("skip-tls", false, "Skip TLS verification for the nexus server instance.")
+	scDebug := scriptCommand.Bool("debug", false, "Set Default for more information on the nexus script execution.")
+	scVerbose := scriptCommand.Bool("verbose", false, "Set Verbose for detailed http request and response logs.")
 	// repo flags
 	repoTask := repoCommand.String("task", "", "Script Task (list|create-maven-hosted|create-maven-proxy|create-maven-group|delete). (Required)")
 	repoName := repoCommand.String("repo-name", "", "Nexus repository name")
@@ -38,9 +36,9 @@ func main() {
 	remoteURL := repoCommand.String("remote-url", "", "Remote URL to be proxied in nexus.")
 	release := repoCommand.Bool("release", false, "Set this flag to create a releases maven repository.")
 	repoMembers := repoCommand.String("repo-members", "", "Comma-separated repository names that should be added to a group repo.")
-	skipTLS = repoCommand.Bool("skip-tls", false, "Skip TLS verification for the nexus server instance.")
-	debug = repoCommand.Bool("debug", false, "Set Default for more information on the nexus script execution.")
-	verbose = repoCommand.Bool("verbose", false, "Set Verbose for detailed http request and response logs.")
+	rcSkipTLS := repoCommand.Bool("skip-tls", false, "Skip TLS verification for the nexus server instance.")
+	rcDebug := repoCommand.Bool("debug", false, "Set Default for more information on the nexus script execution.")
+	rcVerbose := repoCommand.Bool("verbose", false, "Set Verbose for detailed http request and response logs.")
 
 	b.Usage()
 
@@ -85,9 +83,9 @@ func main() {
 		}
 		// set global variables
 		b.SetConnectionDetails()
-		b.SkipTLSVerification = *skipTLS
-		b.Debug = *debug
-		b.Verbose = *verbose
+		b.SkipTLSVerification = *scSkipTLS
+		b.Debug = *scDebug
+		b.Verbose = *scVerbose
 		// run tasks
 		switch *scriptTask {
 		case "list":
@@ -129,9 +127,9 @@ func main() {
 		}
 		// set global variables
 		b.SetConnectionDetails()
-		b.SkipTLSVerification = *skipTLS
-		b.Debug = *debug
-		b.Verbose = *verbose
+		b.SkipTLSVerification = *rcSkipTLS
+		b.Debug = *rcDebug
+		b.Verbose = *rcVerbose
 		// run tasks
 		switch *repoTask {
 		case "list":
