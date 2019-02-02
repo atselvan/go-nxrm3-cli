@@ -8,6 +8,10 @@ import (
 	"os"
 )
 
+// TODO print msg if config is successfully added
+// TODO Refactor the naming of the CLI configuration functions
+// TODO : parameterise conf file name
+
 func SetCLIConfiguration() {
 	configuration := m.CLIConfiguration{NexusURL: NexusURL, Username: AuthUser.Username, Password: AuthUser.Password}
 	configureJson, err := json.Marshal(configuration)
