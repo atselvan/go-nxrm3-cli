@@ -1,1 +1,0 @@
-repository.createBowerProxy('bower-io','http://bower.herokuapp.com');
