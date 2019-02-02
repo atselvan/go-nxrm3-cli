@@ -4,7 +4,6 @@ import (
 	b "com/privatesquare/go/nexus3-repository-cli/backend"
 	m "com/privatesquare/go/nexus3-repository-cli/model"
 	"flag"
-	"fmt"
 	"log"
 	"os"
 )
@@ -32,10 +31,12 @@ func main() {
 	repoTask := repoCommand.String("task", "", "Script Task (list|create-maven-hosted|create-maven-proxy|create-maven-group|delete). (Required)")
 	repoName := repoCommand.String("repo-name", "", "Nexus repository name")
 	repoFormat := repoCommand.String("repo-format", "", "Repository format (maven|npm|nuget|docker).")
+	remoteURL := repoCommand.String("remote-url", "", "Remote URL to be proxied in nexus.")
+	proxyUser := repoCommand.String("proxy-user", "", "Username for accessing the proxy repository")
+	proxyPass := repoCommand.String("proxy-pass", "", "Password for accessing the proxy repository")
 	dockerHttpPort := repoCommand.Int("docker-http-port", 0, "Docker HTTP port.")
 	dockerHttpsPort := repoCommand.Int("docker-https-port", 0, "Docker HTTPs port")
 	blobStoreName := repoCommand.String("blob-store-name", "", "Blob store name.")
-	//remoteURL := repoCommand.String("remote-url", "", "Remote URL to be proxied in nexus.")
 	releases := repoCommand.Bool("releases", false, "Set this flag to create a releases repository.")
 	//repoMembers := repoCommand.String("repo-members", "", "Comma-separated repository names that should be added to a group repo.")
 	rcSkipTLS := repoCommand.Bool("skip-tls", false, "Skip TLS verification for the nexus server instance.")
@@ -81,6 +82,7 @@ func main() {
 		// Required Flags
 		if *scriptTask == "" {
 			scriptCommand.Usage()
+			log.Println("You need to select a task to be performed.")
 			os.Exit(1)
 		}
 		// set global variables
@@ -109,7 +111,7 @@ func main() {
 			b.RunScript(*scriptName, *scriptPayload)
 		default:
 			scriptCommand.Usage()
-			fmt.Printf("%q is not a valid task.\n\n", *scriptTask)
+			log.Printf("%q is not a valid task.\n\n", *scriptTask)
 			os.Exit(1)
 		}
 	}
@@ -118,6 +120,7 @@ func main() {
 		// Required Flags
 		if *repoTask == "" {
 			repoCommand.Usage()
+			log.Println("You need to select a task to be performed.")
 			os.Exit(1)
 		}
 		//Choice flag
@@ -142,11 +145,13 @@ func main() {
 			b.GetRepositoryAttributes(*repoName)
 		case "create-hosted":
 			b.CreateHosted(*repoName, *blobStoreName, *repoFormat, *dockerHttpPort, *dockerHttpsPort, *releases)
+		case "create-proxy":
+			b.CreateProxy(*repoName, *blobStoreName, *repoFormat, *remoteURL, *proxyUser, *proxyPass, *dockerHttpPort, *dockerHttpsPort, *releases)
 		case "delete":
 			b.DeleteRepository(*repoName)
 		default:
 			repoCommand.Usage()
-			fmt.Printf("%q is not a valid task.\n\n", *repoTask)
+			log.Printf("%q is not a valid task.\n\n", *repoTask)
 			os.Exit(1)
 		}
 	}

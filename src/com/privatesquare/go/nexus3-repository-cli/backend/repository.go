@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	regexp2 "regexp"
 )
 
 func ListRepositories(repoName, repoFormat string) {
@@ -40,15 +41,17 @@ func GetRepositoryAttributes(repoName string) {
 }
 
 func CreateHosted(repoName, blobStoreName, format string, dockerHttpPort, dockerHttpsPort int, releases bool) {
-	if repoName == "" {
-		log.Printf("%s : %s", getfuncName(), repoNameRequiredInfo)
+	if repoName == "" || format == "" {
+		log.Printf("%s : %s", getfuncName(), hostedRepoRequiredInfo)
 		os.Exit(1)
 	}
 	format = validateRepositoryFormat(format)
+
 	var attributes m.Attributes
 	recipe := fmt.Sprintf("%s-hosted", format)
+	storage := m.Storage{BlobStoreName: getBlobStoreName(blobStoreName), StrictContentTypeValidation: true, WritePolicy: getWritePolicy(releases)}
+
 	if format == "maven2" {
-		storage := m.Storage{BlobStoreName: getBlobStoreName(blobStoreName), StrictContentTypeValidation: true, WritePolicy: getWritePolicy(releases)}
 		maven := m.Maven{VersionPolicy: getVersionPolicy(releases), LayoutPolicy: "STRICT"}
 		attributes = m.Attributes{Storage: storage, Maven: maven}
 	} else if format == "docker" {
@@ -56,17 +59,56 @@ func CreateHosted(repoName, blobStoreName, format string, dockerHttpPort, docker
 			log.Printf("%s : %s", getfuncName(), dockerPortsInfo)
 			os.Exit(1)
 		}
-		storage := m.Storage{BlobStoreName: getBlobStoreName(blobStoreName), StrictContentTypeValidation: true, WritePolicy: getWritePolicy(releases)}
 		docker := m.Docker{HTTPPort: dockerHttpPort, HTTPSPort: dockerHttpsPort, ForceBasicAuth: true, V1Enabled: false}
 		attributes = m.Attributes{Storage: storage, Docker: docker}
 	} else {
-		storage := m.Storage{BlobStoreName: getBlobStoreName(blobStoreName), StrictContentTypeValidation: true, WritePolicy: getWritePolicy(releases)}
 		attributes = m.Attributes{Storage: storage}
 	}
+
 	repository := m.Repository{Name: repoName, Format: format, Recipe: recipe, Attribute: attributes}
 	payload, err := json.Marshal(repository)
 	logJsonMarshalError(err, getfuncName())
 	result := RunScript("create-hosted-repo", string(payload))
+	printCreateRepoStatus(repoName, result.Status)
+}
+
+func CreateProxy(repoName, blobStoreName, format, remoteURL, proxyUsername, proxyPassword string, dockerHttpPort, dockerHttpsPort int, releases bool) {
+	if repoName == "" || remoteURL == "" || format == "" {
+		log.Printf("%s : %s", getfuncName(), proxyRepoRequiredInfo)
+		os.Exit(1)
+	}
+	format = validateRepositoryFormat(format)
+	validateProxyAuthInfo(proxyUsername, proxyPassword)
+	validateRemoteURL(remoteURL)
+
+	var attributes m.Attributes
+	recipe := fmt.Sprintf("%s-proxy", format)
+	storage := m.Storage{BlobStoreName: getBlobStoreName(blobStoreName), StrictContentTypeValidation: true, WritePolicy: getWritePolicy(releases)}
+	proxy := m.Proxy{RemoteURL: remoteURL, ContentMaxAge: -1, MetadataMaxAge: 1440}
+	proxyAuth := m.HttpClientAuth{Username: proxyUsername, Password: proxyPassword}
+	proxyHttpClient := m.HttpClient{Blocked: false, AutoBlock: true, Authentication: proxyAuth}
+	negetiveCache := m.NegetiveCache{Enabled: true, TimeToLive: 1440}
+
+	if format == "maven2" {
+		maven := m.Maven{VersionPolicy: getVersionPolicy(releases), LayoutPolicy: "STRICT"}
+		attributes = m.Attributes{Storage: storage, Maven: maven, Proxy: proxy, Httpclient: proxyHttpClient, NegativeCache: negetiveCache}
+	} else if format == "docker" {
+		if dockerHttpPort == 0 && dockerHttpsPort == 0 {
+			log.Printf("%s : %s", getfuncName(), dockerPortsInfo)
+			os.Exit(1)
+		}
+		docker := m.Docker{HTTPPort: dockerHttpPort, HTTPSPort: dockerHttpsPort, ForceBasicAuth: true, V1Enabled: false}
+		dockerProxy := m.DockerProxy{IndexType: "REGISTRY"}
+		attributes = m.Attributes{Storage: storage, Docker: docker, Proxy: proxy, DockerProxy: dockerProxy, Httpclient: proxyHttpClient, NegativeCache: negetiveCache}
+	} else {
+		storage := m.Storage{BlobStoreName: getBlobStoreName(blobStoreName), StrictContentTypeValidation: true, WritePolicy: getWritePolicy(releases)}
+		attributes = m.Attributes{Storage: storage, Proxy: proxy, Httpclient: proxyHttpClient, NegativeCache: negetiveCache}
+	}
+
+	repository := m.Repository{Name: repoName, Format: format, Recipe: recipe, Attribute: attributes}
+	payload, err := json.Marshal(repository)
+	logJsonMarshalError(err, getfuncName())
+	result := RunScript("create-proxy-repo", string(payload))
 	printCreateRepoStatus(repoName, result.Status)
 }
 
@@ -187,13 +229,35 @@ func validateRepositoryFormat(format string) string {
 		formatChoice[repoFormat] = true
 	}
 	if _, validChoice := formatChoice[format]; !validChoice {
-		log.Printf("%q is not a valid repository format. Available repository formats are : %v\n", format, RepoFormats)
+		log.Printf("%s : %q is not a valid repository format. Available repository formats are : %v\n", getfuncName(), format, RepoFormats)
 		os.Exit(1)
 	}
 	if format == "maven" {
 		return "maven2"
 	}
 	return format
+}
+
+func validateProxyAuthInfo(proxyUsername, proxyPassword string) {
+	if proxyUsername == "" && proxyPassword == "" {
+		return
+	} else if proxyUsername != "" && proxyPassword != "" {
+		return
+	} else {
+		log.Printf("%s : You need to provide both proxy-user and proxy-pass to set credentials to a proxy repository\n", getfuncName())
+		os.Exit(1)
+	}
+}
+
+func validateRemoteURL(url string) {
+	httpRegex, _ := regexp2.Compile(`^(http://).*`)
+	httpsRegex, _ := regexp2.Compile(`^(https://).*`)
+	if httpRegex.MatchString(url) || httpsRegex.MatchString(url) {
+		return
+	} else {
+		log.Printf("%s : %q is an invalid url. URL must begin with either http:// or https://\n", getfuncName(), url)
+		os.Exit(1)
+	}
 }
 
 func printCreateRepoStatus(repoName, status string) {
