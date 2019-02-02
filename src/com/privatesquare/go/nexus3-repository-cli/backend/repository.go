@@ -39,7 +39,6 @@ func GetRepositoryAttributes(repoName string) {
 	fmt.Println(result)
 }
 
-// TODO Creation of docker repository does not work as expected
 func CreateHosted(repoName, blobStoreName, format string, dockerHttpPort, dockerHttpsPort int, releases bool) {
 	if repoName == "" {
 		log.Printf("%s : %s", getfuncName(), repoNameRequiredInfo)
