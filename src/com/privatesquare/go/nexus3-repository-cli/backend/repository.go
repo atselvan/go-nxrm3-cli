@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 )
 
 func ListRepositories(repoName, repoFormat string) {
@@ -26,42 +25,49 @@ func ListRepositories(repoName, repoFormat string) {
 	}
 }
 
-func CreateMavenHostedRepository(repoName, blobStoreName string, release bool) {
+func GetRepositoryAttributes(repoName string) {
 	if repoName == "" {
-		log.Printf("%s : %s", getfuncName(), mavenHostedRepoRequiredInfo)
+		log.Printf("%s : %s", getfuncName(), repoNameRequiredInfo)
 		os.Exit(1)
 	}
-	payload, err := json.Marshal(m.Repository{Name: repoName, BlobStoreName: getBlobStoreName(blobStoreName), VersionPolicy: getVersionPolicy(release)})
+	attribute := m.Attributes{Maven: m.Maven{VersionPolicy: "Releases", LayoutPolicy: "Something"}}
+	payload, err := json.Marshal(attribute)
 	logJsonMarshalError(err, getfuncName())
-	result := RunScript("create-maven-hosted", string(payload))
-	printCreateRepoStatus(repoName, result.Status)
+	SkipTLSVerification = true
+	Verbose = true
+	result := RunScript("get-repo-attributes", string(payload))
+	fmt.Println(result)
 }
 
-func CreateMavenProxyRepository(repoName, blobStoreName, remoteURL string) {
-	if repoName == "" || remoteURL == "" {
-		log.Printf("%s : %s", getfuncName(), proxyRepoRequiredInfo)
+// TODO Creation of docker repository does not work as expected
+func CreateHosted(repoName, blobStoreName, format string, dockerHttpPort, dockerHttpsPort int, releases bool) {
+	if repoName == "" {
+		log.Printf("%s : %s", getfuncName(), repoNameRequiredInfo)
 		os.Exit(1)
 	}
-	payload, err := json.Marshal(m.Repository{Name: repoName, RemoteURL: remoteURL, BlobStoreName: getBlobStoreName(blobStoreName)})
-	logJsonMarshalError(err, getfuncName())
-	result := RunScript("create-maven-proxy", string(payload))
-	printCreateRepoStatus(repoName, result.Status)
-}
-
-func CreateMavenGroupRepository(repoName, blobStoreName string, repoMembers string) {
-	if repoName == "" || repoMembers == "" {
-		log.Printf("%s : %s", getfuncName(), groupRequiredInfo)
-		os.Exit(1)
-	}
-	for _, r := range strings.Split(repoMembers, ",") {
-		if !repositoryExists(r) {
-			log.Printf("Repository %q does not exist in nexus. Please check the repo-members value and try again\n", r)
+	format = validateRepositoryFormat(format)
+	var attributes m.Attributes
+	recipe := fmt.Sprintf("%s-hosted", format)
+	if format == "maven2" {
+		storage := m.Storage{BlobStoreName: getBlobStoreName(blobStoreName), StrictContentTypeValidation: true, WritePolicy: getWritePolicy(releases)}
+		maven := m.Maven{VersionPolicy: getVersionPolicy(releases), LayoutPolicy: "STRICT"}
+		attributes = m.Attributes{Storage: storage, Maven: maven}
+	} else if format == "docker" {
+		if dockerHttpPort == 0 && dockerHttpsPort == 0 {
+			log.Printf("%s : %s", getfuncName(), dockerPortsInfo)
 			os.Exit(1)
 		}
+		storage := m.Storage{BlobStoreName: getBlobStoreName(blobStoreName), StrictContentTypeValidation: true, WritePolicy: getWritePolicy(releases)}
+		docker := m.Docker{HTTPPort: dockerHttpPort, HTTPSPort: dockerHttpsPort, ForceBasicAuth: true, V1Enabled: false}
+		attributes = m.Attributes{Storage: storage, Docker: docker}
+	} else {
+		storage := m.Storage{BlobStoreName: getBlobStoreName(blobStoreName), StrictContentTypeValidation: true, WritePolicy: getWritePolicy(releases)}
+		attributes = m.Attributes{Storage: storage}
 	}
-	payload, err := json.Marshal(m.Repository{Name: repoName, Members: strings.Split(repoMembers, ","), BlobStoreName: getBlobStoreName(blobStoreName)})
+	repository := m.Repository{Name: repoName, Format: format, Recipe: recipe, Attribute: attributes}
+	payload, err := json.Marshal(repository)
 	logJsonMarshalError(err, getfuncName())
-	result := RunScript("create-maven-group", string(payload))
+	result := RunScript("create-hosted-repo", string(payload))
 	printCreateRepoStatus(repoName, result.Status)
 }
 
@@ -155,18 +161,47 @@ func getBlobStoreName(blobStoreName string) string {
 func getVersionPolicy(release bool) string {
 	var versionPolicy string
 	if release {
-		versionPolicy = "release"
+		versionPolicy = "RELEASE"
 	} else {
-		versionPolicy = "snapshot"
+		versionPolicy = "SNAPSHOT"
 	}
 	return versionPolicy
 }
 
+func getWritePolicy(releases bool) string {
+	var writePolicy string
+	if releases {
+		writePolicy = "ALLOW_ONCE"
+	} else {
+		writePolicy = "ALLOW"
+	}
+	return writePolicy
+}
+
+func validateRepositoryFormat(format string) string {
+	if format == "" {
+		log.Printf("%s : %s", getfuncName(), repoFormatRequiredInfo)
+		os.Exit(1)
+	}
+	formatChoice := map[string]bool{"": true}
+	for _, repoFormat := range RepoFormats {
+		formatChoice[repoFormat] = true
+	}
+	if _, validChoice := formatChoice[format]; !validChoice {
+		log.Printf("%q is not a valid repository format. Available repository formats are : %v\n", format, RepoFormats)
+		os.Exit(1)
+	}
+	if format == "maven" {
+		return "maven2"
+	}
+	return format
+}
+
 func printCreateRepoStatus(repoName, status string) {
 	if status == "200 OK" {
-		log.Printf("Repository %s was created in nexus\n", repoName)
+		log.Printf("Repository %q was created in nexus\n", repoName)
 	} else if status == "302 Found" {
-		log.Printf("Repository %s already exists in nexus\n", repoName)
+		log.Printf("Repository %q already exists in nexus\n", repoName)
 	} else {
 		log.Printf("Error creating repository : %s\n", setVerboseInfo)
 	}

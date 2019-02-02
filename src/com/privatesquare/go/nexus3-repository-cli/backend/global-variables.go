@@ -8,4 +8,5 @@ var (
 	Verbose             bool
 	Debug               bool
 	SkipTLSVerification bool
+	RepoFormats         = []string{"maven", "npm", "nuget", "bower", "pypi", "raw", "rubygems", "yum", "docker"}
 )

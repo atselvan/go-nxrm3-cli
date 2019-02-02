@@ -32,10 +32,12 @@ func main() {
 	repoTask := repoCommand.String("task", "", "Script Task (list|create-maven-hosted|create-maven-proxy|create-maven-group|delete). (Required)")
 	repoName := repoCommand.String("repo-name", "", "Nexus repository name")
 	repoFormat := repoCommand.String("repo-format", "", "Repository format (maven|npm|nuget|docker).")
+	dockerHttpPort := repoCommand.Int("docker-http-port", 0, "Docker HTTP port.")
+	dockerHttpsPort := repoCommand.Int("docker-https-port", 0, "Docker HTTPs port")
 	blobStoreName := repoCommand.String("blob-store-name", "", "Blob store name.")
-	remoteURL := repoCommand.String("remote-url", "", "Remote URL to be proxied in nexus.")
-	release := repoCommand.Bool("release", false, "Set this flag to create a releases maven repository.")
-	repoMembers := repoCommand.String("repo-members", "", "Comma-separated repository names that should be added to a group repo.")
+	//remoteURL := repoCommand.String("remote-url", "", "Remote URL to be proxied in nexus.")
+	releases := repoCommand.Bool("releases", false, "Set this flag to create a releases repository.")
+	//repoMembers := repoCommand.String("repo-members", "", "Comma-separated repository names that should be added to a group repo.")
 	rcSkipTLS := repoCommand.Bool("skip-tls", false, "Skip TLS verification for the nexus server instance.")
 	rcDebug := repoCommand.Bool("debug", false, "Set Default for more information on the nexus script execution.")
 	rcVerbose := repoCommand.Bool("verbose", false, "Set Verbose for detailed http request and response logs.")
@@ -44,7 +46,7 @@ func main() {
 
 	flag.Parse()
 
-	if len(os.Args) < 2{
+	if len(os.Args) < 2 {
 		flag.Usage()
 		os.Exit(1)
 	}
@@ -119,10 +121,12 @@ func main() {
 			os.Exit(1)
 		}
 		//Choice flag
-		repoFormatChoice := map[string]bool{"": true, "maven2": true, "npm": true, "nuget": true, "bower": true, "docker": true}
+		repoFormatChoice := map[string]bool{"": true}
+		for _, repoFormat := range b.RepoFormats {
+			repoFormatChoice[repoFormat] = true
+		}
 		if _, validChoice := repoFormatChoice[*repoFormat]; !validChoice {
-			repoCommand.Usage()
-			log.Printf("%q is not a valid repository format\n\n", *repoFormat)
+			log.Printf("%q is not a valid repository format. Available repository formats are : %v\n", *repoFormat, b.RepoFormats)
 			os.Exit(1)
 		}
 		// set global variables
@@ -134,12 +138,10 @@ func main() {
 		switch *repoTask {
 		case "list":
 			b.ListRepositories(*repoName, *repoFormat)
-		case "create-maven-hosted":
-			b.CreateMavenHostedRepository(*repoName, *blobStoreName, *release)
-		case "create-maven-proxy":
-			b.CreateMavenProxyRepository(*repoName, *blobStoreName, *remoteURL)
-		case "create-maven-group":
-			b.CreateMavenGroupRepository(*repoName, *blobStoreName, *repoMembers)
+		case "get-attributes":
+			b.GetRepositoryAttributes(*repoName)
+		case "create-hosted":
+			b.CreateHosted(*repoName, *blobStoreName, *repoFormat, *dockerHttpPort, *dockerHttpsPort, *releases)
 		case "delete":
 			b.DeleteRepository(*repoName)
 		default:
