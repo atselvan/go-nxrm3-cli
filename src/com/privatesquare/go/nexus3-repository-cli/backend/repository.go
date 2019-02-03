@@ -134,6 +134,39 @@ func CreateGroup(repoName, blobStoreName, format, repoMembers string, dockerHttp
 	printCreateRepoStatus(repoName, result.Status)
 }
 
+func AddMembersToGroup(repoName, format, repoMembers string) {
+	if repoName == "" || repoMembers == "" || format == "" {
+		log.Printf("%s : %s", getfuncName(), groupRequiredInfo)
+		os.Exit(1)
+	}
+	format = validateRepositoryFormat(format)
+	validList := validateGroupMembers(repoMembers, format)
+	if repositoryExists(repoName) {
+		repo := getRepository(repoName)
+		currentMembers := repo.Attributes.Group.MemberNames
+		for _, newMember := range validList {
+			if entryExists(currentMembers, newMember) {
+				log.Printf("Member %q already exists in the group %q, hence not adding the member again\n", newMember, repoName)
+			} else if newMember == repoName {
+				log.Printf("Member %q == group %q, cannot add a group repository as a member in the same group\n", newMember, repoName)
+			} else {
+				log.Printf("Member %q is added to the group %q\n", newMember, repoName)
+				currentMembers = append(currentMembers, newMember)
+			}
+		}
+		repo.Attributes.Group = m.Group{MemberNames: currentMembers}
+		repository := m.Repository{Name: repoName, Format: format, Attributes: repo.Attributes}
+		payload, err := json.Marshal(repository)
+		logJsonMarshalError(err, getfuncName())
+		result := RunScript("add-group-members", string(payload))
+		printUpdateRepoStatus(repoName, result.Status)
+	} else {
+		log.Printf("Repository %q was not found\n", repoName)
+	}
+}
+
+// TODO: Add a function to remove members from group
+
 func DeleteRepository(repoName string) {
 	if repoName == "" {
 		log.Printf("%s : %s", getfuncName(), repoNameRequiredInfo)
@@ -298,7 +331,7 @@ func validateGroupMembers(repoMembers, format string) []string {
 		}
 	}
 	if len(validList) < 1 {
-		log.Printf("%s : Atleast one valid group member should be provided to create a group repository", getfuncName())
+		log.Printf("%s : Atleast one valid group member should be provided to add to a group repository", getfuncName())
 		os.Exit(1)
 	}
 	return validList
@@ -311,6 +344,16 @@ func printCreateRepoStatus(repoName, status string) {
 		log.Printf("Repository %q already exists in nexus\n", repoName)
 	} else {
 		log.Printf("Error creating repository : %s\n", setVerboseInfo)
+	}
+}
+
+func printUpdateRepoStatus(repoName, status string) {
+	if status == "200 OK" {
+		log.Printf("Repository %q was updated in nexus\n", repoName)
+	} else if status == "404 Not Found" {
+		log.Printf("Repository %q was not found in nexus\n", repoName)
+	} else {
+		log.Printf("Error updating repository : %s\n", setVerboseInfo)
 	}
 }
 

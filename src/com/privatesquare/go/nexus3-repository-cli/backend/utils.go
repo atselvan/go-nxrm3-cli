@@ -142,6 +142,15 @@ func printStringSlice(slice []string) {
 	}
 }
 
+func entryExists(slice []string, entry string) bool {
+	for i := 0; i < len(slice); i++ {
+		if slice[i] == entry {
+			return true
+		}
+	}
+	return false
+}
+
 func getfuncName() string {
 	pc, _, _, _ := runtime.Caller(1)
 	return runtime.FuncForPC(pc).Name()

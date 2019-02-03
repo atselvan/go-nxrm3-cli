@@ -149,6 +149,8 @@ func main() {
 			b.CreateGroup(*repoName, *blobStoreName, *repoFormat, *repoMembers, *dockerHttpPort, *dockerHttpsPort, *releases)
 		case "delete":
 			b.DeleteRepository(*repoName)
+		case "add-group-members":
+			b.AddMembersToGroup(*repoName, *repoFormat, *repoMembers)
 		default:
 			repoCommand.Usage()
 			log.Printf("%q is not a valid task.\n\n", *repoTask)

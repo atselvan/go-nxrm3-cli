@@ -8,7 +8,11 @@ createRepoStructure() {
     $1 repo -skip-tls -task create-hosted -repo-name $2-releases -releases -repo-format $2
     $1 repo -skip-tls -task create-proxy -repo-name $2-proxy -releases -repo-format $2 -remote-url https://localhost
     $1 repo -skip-tls -task create-proxy -repo-name $2-proxy-withCred -releases -repo-format $2 -remote-url https://localhost -proxy-user test -proxy-pass test123
-    $1 repo -skip-tls -task create-group -repo-name $2-group -repo-format $2 -repo-members $2-snapshots,$2-releases,$2-proxy,$2-proxy-withCred
+    $1 repo -skip-tls -task create-group -repo-name $2-group -repo-format $2 -repo-members $2-snapshots,$2-releases,$2-proxy-withCred
+}
+
+addGroupMembers(){
+    $1 repo -skip-tls -task add-group-members -repo-name $2-group -repo-format $2 -repo-members $2-snapshots,$2-releases,$2-proxy,$2-group
 }
 
 cleanUpRepoStructure(){
@@ -71,7 +75,16 @@ for format in "${repoFormat[@]}"
 do
     createRepoStructure ${CLI} ${format}
 done
+
 printf "****************************************************************************************************"
 printf "\nCreating docker repository structures\n"
 printf "****************************************************************************************************\n"
 createDockerRepoStructure ${CLI}
+
+printf "****************************************************************************************************"
+printf "\nAdding Members to a group\n"
+printf "****************************************************************************************************\n"
+for format in "${repoFormat[@]}"
+do
+    addGroupMembers ${CLI} ${format}
+done
