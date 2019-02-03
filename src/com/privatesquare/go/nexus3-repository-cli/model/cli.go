@@ -1,6 +1,6 @@
 package model
 
-type CLIConfiguration struct {
+type ConnDetails struct {
 	NexusURL string
 	Username string
 	Password string

@@ -5,37 +5,34 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"log"
 	"os"
 )
 
-// TODO print msg if config is successfully added
-// TODO Refactor the naming of the CLI configuration functions
-// TODO : parameterise conf file name
-
-func SetCLIConfiguration() {
-	configuration := m.CLIConfiguration{NexusURL: NexusURL, Username: AuthUser.Username, Password: AuthUser.Password}
+func StoreConnectionDetails() {
+	configuration := m.ConnDetails{NexusURL: NexusURL, Username: AuthUser.Username, Password: AuthUser.Password}
 	configureJson, err := json.Marshal(configuration)
 	logJsonMarshalError(err, jsonMarshalError)
-	writeFile("nexus3-repository-cli.json", configureJson)
+	writeFile(ConfFileName, configureJson)
+	log.Printf(connDetailsSuccessInfo, ConfFileName)
 }
 
-func getCLIConfiguration() m.CLIConfiguration {
-	var conf m.CLIConfiguration
-	data := readFile("nexus3-repository-cli.json")
+func getConnectionDetails() m.ConnDetails {
+	var conf m.ConnDetails
+	data := readFile(ConfFileName)
 	err := json.Unmarshal([]byte(data), &conf)
 	logJsonUnmarshalError(err, jsonUnmarshalError)
 	return conf
 }
 
 func SetConnectionDetails() {
-	if fileExists("nexus3-repository-cli.json") {
-		conf := getCLIConfiguration()
+	if fileExists(ConfFileName) {
+		conf := getConnectionDetails()
 		NexusURL = conf.NexusURL
 		AuthUser.Username = conf.Username
 		AuthUser.Password = conf.Password
 	} else {
-		fmt.Println("Server connection details are not set...")
-		fmt.Printf("Run %q to set the connection details.", "nexus3-repository-cli configure")
+		log.Printf(connDetailsEmptyInfo, "nexus3-repository-cli configure")
 		os.Exit(1)
 	}
 }
@@ -43,46 +40,65 @@ func SetConnectionDetails() {
 func Usage() {
 	flag.Usage = func() {
 		fmt.Printf("Usage: nexus3-repository-cli [command]\n\n")
-		fmt.Printf("[commands]\n  configurate\tSet nexus connection details\n  script  \tNexus script operations\n  repo  \tNexus repository operations\n\n")
+		fmt.Printf("[commands]\n  %s\t"+
+			"%s\n  %s  \t"+
+			"%s\n  %s  \t%s"+
+			"\n\n",
+			ConfCommandFlag, ConfCommandUsage,
+			ScriptCommandFlag, ScriptCommandUsage,
+			RepoCommandFlag, RepoCommandUsage)
 	}
 }
 
-//TODO : Set usage as constants?
-func ConfigureCommandUsage(fs *flag.FlagSet) {
+func PrintConfCommandUsage(fs *flag.FlagSet) {
 	fs.Usage = func() {
 		fmt.Printf("Usage: nexus3-repository-cli configure [args]\n\n")
-		fmt.Println("[args]")
+		fmt.Printf("[args]\n\n")
 		fs.PrintDefaults()
-		fmt.Println()
+		fmt.Printf("\n")
 	}
 }
 
-//TODO : Set usage as constants?
-func ScriptCommandUsage(fs *flag.FlagSet) {
+func PrintScriptCommandUsage(fs *flag.FlagSet) {
 	fs.Usage = func() {
 		fmt.Printf("Usage: nexus3-repository-cli script [args] [options]\n\n")
-		fmt.Printf("[args]\n  -task string\n\tScript Task (list|add|update|add-or-update|delete|run). (Required)\n  " +
-			"-script-name string\n\tName of the script to be executed in nexus. The script should exist under the path ./scripts/groovy.\n  " +
-			"-payload string\n\tArguments to be passed to a nexus script can be sent as a payload during script execution.\n\n" +
-			"[options]\n  " +
-			"-skip-tls\n\tSkip TLS verification for the nexus server instance.\n  " +
-			"-debug\n\tSet Default for more information on the nexus script execution.\n  " +
-			"-verbose\n\tSet Verbose for detailed http request and response logs.\n\n")
+		fmt.Printf("[args]\n\n  "+
+			"-%s string\t%s\n  "+
+			"-%s string\n\t%s\n  -%s string\n\t%s\n"+
+			"\n[options]\n\n  -%s\n\t%s\n  -%s\n\t%s\n  -%s\n\t%s\n\n",
+			TaskFlag, ScriptTaskUsage,
+			ScriptNameFlag, ScriptNameUsage,
+			ScriptPayloadFlag, ScriptPayloadUsage,
+			SkipTlsFlag, SkipTlsUsage,
+			DebugFlag, DebugUsage,
+			VerboseFlag, VerboseUsage)
 	}
 }
 
-//TODO : Set usage as constants?
-func RepoCommandUsage(fs *flag.FlagSet) {
+func PrintRepoCommandUsage(fs *flag.FlagSet) {
 	fs.Usage = func() {
 		fmt.Printf("Usage: nexus3-repository-cli repo [args] [options]\n\n")
-		fmt.Printf("[args]\n  -repo-name string\n\tNexus repository name.\n  " +
-			"-repo-format string\n\tRepository format (maven|npm|nuget|docker).\n  " +
-			"-remote-url string\n\tRemote URL to be proxied in nexus.\n  " +
-			"-repo-members string\n\tComma-separated repository names that should be added to a group repo.\n  " +
-			"-release\n\tSet this flag to create a releases maven repository.\n" +
-			"[options]\n  " +
-			"-skip-tls\n\tSkip TLS verification for the nexus server instance.\n  " +
-			"-debug\n\tSet Default for more information on the nexus script execution.\n  " +
-			"-verbose\n\tSet Verbose for detailed http request and response logs.\n\n")
+		fmt.Printf("[args]\n\n  "+
+			"-%s string\t%s\n  "+
+			"-%s string\n\t%s\n  -%s string\n\t%s\n  "+
+			"-%s string\n\t%s\n  -%s string\n\t%s\n  "+
+			"-%s string\n\t%s\n  -%s string\n\t%s\n  "+
+			"-%s string\n\t%s\n  -%s string\n\t%s\n  "+
+			"-%s string\n\t%s\n  -%s string\n\t%s\n  "+
+			"\n[options]\n\n  -%s\n\t%s\n  -%s\n\t%s\n  -%s\n\t%s\n\n",
+			TaskFlag, RepoTaskUsage,
+			RepoNameFlag, RepoNameUsage,
+			RepoFormatFlag, fmt.Sprintf(RepoFormatUsage, RepoFormats),
+			RemoteURLFlag, RemoteURLUsage,
+			RepoMembersFlag, RepoMembersUsage,
+			ProxyUserFlag, ProxyUserUsage,
+			ProxyPassFlag, ProxyPassUsage,
+			DockerHttpPortFlag, DockerHttpPortUsage,
+			DockerHttpsPortFlag, DockerHttpsPortUsage,
+			BlobStoreNameFlag, BlobStoreNameUsage,
+			ReleaseFlag, ReleaseUsage,
+			SkipTlsFlag, SkipTlsUsage,
+			DebugFlag, DebugUsage,
+			VerboseFlag, VerboseUsage)
 	}
 }

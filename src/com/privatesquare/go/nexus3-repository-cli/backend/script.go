@@ -145,14 +145,15 @@ func getScripts() []string {
 	)
 	req := createBaseRequest("GET", url, m.RequestBody{})
 	respBody, status := httpRequest(req)
-	err := json.Unmarshal(respBody, &scripts)
-	logJsonUnmarshalError(err, getfuncName())
-	for _, s := range scripts {
-		scriptsList = append(scriptsList, s.Name)
-	}
 	if status != "200 OK" {
 		log.Printf("%s : %s", getfuncName(), setVerboseInfo)
 		os.Exit(1)
+	} else {
+		err := json.Unmarshal(respBody, &scripts)
+		logJsonUnmarshalError(err, getfuncName())
+		for _, s := range scripts {
+			scriptsList = append(scriptsList, s.Name)
+		}
 	}
 	return scriptsList
 }

@@ -10,38 +10,36 @@ import (
 
 func main() {
 
-	//TODO : Explain the script and repo tasks
-
 	// subcommands
-	confCommand := flag.NewFlagSet("configure", flag.ExitOnError)
-	scriptCommand := flag.NewFlagSet("script", flag.ExitOnError)
-	repoCommand := flag.NewFlagSet("repo", flag.ExitOnError)
+	confCommand := flag.NewFlagSet(b.ConfCommandFlag, flag.ExitOnError)
+	scriptCommand := flag.NewFlagSet(b.ScriptCommandFlag, flag.ExitOnError)
+	repoCommand := flag.NewFlagSet(b.RepoCommandFlag, flag.ExitOnError)
 	// conf flags
-	nexusURL := confCommand.String("nexus-url", "", "Nexus 3 server URL. (Required)")
-	username := confCommand.String("username", "", "Nexus 3 server login user. (Required)")
-	password := confCommand.String("password", "", "Nexus 3 server login password. (Required)")
+	nexusURL := confCommand.String(b.NexusURLFlag, "", b.NexusURLUsage)
+	username := confCommand.String(b.NexusUsernameFlag, "", b.NexusUsernameUsage)
+	password := confCommand.String(b.NexusPasswordFlag, "", b.NexusPasswordUsage)
 	// script flags
-	scriptTask := scriptCommand.String("task", "", "Script Task (list|add|update|add-or-update|delete|run). (Required)")
-	scriptName := scriptCommand.String("script-name", "", "Name of the script to be executed in nexus. \nThe script should exist under the path ./scripts/groovy")
-	scriptPayload := scriptCommand.String("payload", "", "Arguments to be passed to a nexus script can be sent as a payload during script execution.")
-	scSkipTLS := scriptCommand.Bool("skip-tls", false, "Skip TLS verification for the nexus server instance.")
-	scDebug := scriptCommand.Bool("debug", false, "Set Default for more information on the nexus script execution.")
-	scVerbose := scriptCommand.Bool("verbose", false, "Set Verbose for detailed http request and response logs.")
+	scriptTask := scriptCommand.String(b.TaskFlag, "", b.ScriptTaskUsage)
+	scriptName := scriptCommand.String(b.ScriptNameFlag, "", b.ScriptNameUsage)
+	scriptPayload := scriptCommand.String(b.ScriptPayloadFlag, "", b.ScriptPayloadUsage)
+	scSkipTLS := scriptCommand.Bool(b.SkipTlsFlag, false, b.SkipTlsUsage)
+	scDebug := scriptCommand.Bool(b.DebugFlag, false, b.DebugUsage)
+	scVerbose := scriptCommand.Bool(b.VerboseFlag, false, b.VerboseUsage)
 	// repo flags
-	repoTask := repoCommand.String("task", "", "Script Task (list|create-maven-hosted|create-maven-proxy|create-maven-group|delete). (Required)")
-	repoName := repoCommand.String("repo-name", "", "Nexus repository name")
-	repoFormat := repoCommand.String("repo-format", "", "Repository format (maven|npm|nuget|docker).")
-	remoteURL := repoCommand.String("remote-url", "", "Remote URL to be proxied in nexus.")
-	proxyUser := repoCommand.String("proxy-user", "", "Username for accessing the proxy repository")
-	proxyPass := repoCommand.String("proxy-pass", "", "Password for accessing the proxy repository")
-	dockerHttpPort := repoCommand.Int("docker-http-port", 0, "Docker HTTP port.")
-	dockerHttpsPort := repoCommand.Int("docker-https-port", 0, "Docker HTTPs port")
-	blobStoreName := repoCommand.String("blob-store-name", "", "Blob store name.")
-	releases := repoCommand.Bool("releases", false, "Set this flag to create a releases repository.")
-	repoMembers := repoCommand.String("repo-members", "", "Comma-separated repository names that should be added to a group repo.")
-	rcSkipTLS := repoCommand.Bool("skip-tls", false, "Skip TLS verification for the nexus server instance.")
-	rcDebug := repoCommand.Bool("debug", false, "Set Default for more information on the nexus script execution.")
-	rcVerbose := repoCommand.Bool("verbose", false, "Set Verbose for detailed http request and response logs.")
+	repoTask := repoCommand.String(b.TaskFlag, "", b.RepoTaskUsage)
+	repoName := repoCommand.String(b.RepoNameFlag, "", b.RepoNameUsage)
+	repoFormat := repoCommand.String(b.RepoFormatFlag, "", b.RepoFormatUsage)
+	remoteURL := repoCommand.String(b.RemoteURLFlag, "", b.RemoteURLUsage)
+	repoMembers := repoCommand.String(b.RepoMembersFlag, "", b.RepoMembersUsage)
+	proxyUser := repoCommand.String(b.ProxyUserFlag, "", b.ProxyUserUsage)
+	proxyPass := repoCommand.String(b.ProxyPassFlag, "", b.ProxyPassUsage)
+	dockerHttpPort := repoCommand.Int(b.DockerHttpPortFlag, 0, b.DockerHttpPortUsage)
+	dockerHttpsPort := repoCommand.Int(b.DockerHttpsPortFlag, 0, b.DockerHttpsPortUsage)
+	blobStoreName := repoCommand.String(b.BlobStoreNameFlag, "", b.BlobStoreNameUsage)
+	releases := repoCommand.Bool(b.ReleaseFlag, false, b.ReleaseUsage)
+	rcSkipTLS := repoCommand.Bool(b.SkipTlsFlag, false, b.SkipTlsUsage)
+	rcDebug := repoCommand.Bool(b.DebugFlag, false, b.DebugUsage)
+	rcVerbose := repoCommand.Bool(b.VerboseFlag, false, b.VerboseUsage)
 
 	b.Usage()
 
@@ -54,13 +52,13 @@ func main() {
 
 	switch os.Args[1] {
 	case "configure":
-		b.ConfigureCommandUsage(confCommand)
+		b.PrintConfCommandUsage(confCommand)
 		confCommand.Parse(os.Args[2:])
 	case "script":
-		b.ScriptCommandUsage(scriptCommand)
+		b.PrintScriptCommandUsage(scriptCommand)
 		scriptCommand.Parse(os.Args[2:])
 	case "repo":
-		b.RepoCommandUsage(repoCommand)
+		b.PrintRepoCommandUsage(repoCommand)
 		repoCommand.Parse(os.Args[2:])
 	default:
 		flag.Usage()
@@ -75,14 +73,14 @@ func main() {
 		}
 		b.NexusURL = *nexusURL
 		b.AuthUser = m.AuthUser{Username: *username, Password: *password}
-		b.SetCLIConfiguration()
+		b.StoreConnectionDetails()
 	}
 
 	if scriptCommand.Parsed() {
 		// Required Flags
 		if *scriptTask == "" {
 			scriptCommand.Usage()
-			log.Println("You need to select a task to be performed.")
+			log.Printf(b.TaskEmptyInfo, b.ScriptTasks)
 			os.Exit(1)
 		}
 		// set global variables
@@ -111,7 +109,7 @@ func main() {
 			b.RunScript(*scriptName, *scriptPayload)
 		default:
 			scriptCommand.Usage()
-			log.Printf("%q is not a valid task.\n\n", *scriptTask)
+			log.Printf(b.TaskNotValidInfo, *scriptTask, "script", b.ScriptTasks)
 			os.Exit(1)
 		}
 	}
@@ -120,7 +118,7 @@ func main() {
 		// Required Flags
 		if *repoTask == "" {
 			repoCommand.Usage()
-			log.Println("You need to select a task to be performed.")
+			log.Printf(b.TaskEmptyInfo, b.RepoTasks)
 			os.Exit(1)
 		}
 		//Choice flag
@@ -129,7 +127,7 @@ func main() {
 			repoFormatChoice[repoFormat] = true
 		}
 		if _, validChoice := repoFormatChoice[*repoFormat]; !validChoice {
-			log.Printf("%q is not a valid repository format. Available repository formats are : %v\n", *repoFormat, b.RepoFormats)
+			log.Printf(b.RepoFormatNotValidInfo, *repoFormat, b.RepoFormats)
 			os.Exit(1)
 		}
 		// set global variables
@@ -147,13 +145,13 @@ func main() {
 			b.CreateProxy(*repoName, *blobStoreName, *repoFormat, *remoteURL, *proxyUser, *proxyPass, *dockerHttpPort, *dockerHttpsPort, *releases)
 		case "create-group":
 			b.CreateGroup(*repoName, *blobStoreName, *repoFormat, *repoMembers, *dockerHttpPort, *dockerHttpsPort, *releases)
-		case "delete":
-			b.DeleteRepository(*repoName)
 		case "add-group-members":
 			b.AddMembersToGroup(*repoName, *repoFormat, *repoMembers)
+		case "delete":
+			b.DeleteRepository(*repoName)
 		default:
 			repoCommand.Usage()
-			log.Printf("%q is not a valid task.\n\n", *repoTask)
+			log.Printf(b.TaskNotValidInfo, *repoTask, "repo", b.RepoTasks)
 			os.Exit(1)
 		}
 	}

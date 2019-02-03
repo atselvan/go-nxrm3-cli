@@ -9,4 +9,6 @@ var (
 	Debug               bool
 	SkipTLSVerification bool
 	RepoFormats         = []string{"maven", "npm", "nuget", "bower", "pypi", "raw", "rubygems", "yum", "docker"}
+	ScriptTasks         = []string{"list", "add", "update", "add-or-update", "delete", "run"}
+	RepoTasks           = []string{"list", "create-hosted", "create-proxy", "create-group", "add-group-member", "delete"}
 )

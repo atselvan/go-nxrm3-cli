@@ -1,6 +1,7 @@
 package backend
 
 const (
+	ConfFileName = "nexus3-repository-cli.json"
 
 	// API Extensions
 	apiBase        = "service/rest"
@@ -14,8 +15,81 @@ const (
 	jsonMarshalError   = "JSON Marshal Error"
 	jsonUnmarshalError = "JSON Unmarshal Error"
 
-	// Info Strings
+	// CLI flags and usage
+	ConfCommandFlag    = "configure"
+	ConfCommandUsage   = "Set nexus connection details"
+	ScriptCommandFlag  = "script"
+	ScriptCommandUsage = "Nexus script operations"
+	RepoCommandFlag    = "repo"
+	RepoCommandUsage   = "Nexus repository operations"
+
+	NexusURLFlag       = "nexus-url"
+	NexusURLUsage      = "Nexus 3 server URL. (Required)"
+	NexusUsernameFlag  = "username"
+	NexusUsernameUsage = "Nexus 3 server login user. (Required)"
+	NexusPasswordFlag  = "password"
+	NexusPasswordUsage = "Nexus 3 server login password. (Required)"
+
+	TaskFlag     = "task"
+	SkipTlsFlag  = "skip-tls"
+	SkipTlsUsage = "Skip TLS verification for the nexus server instance"
+	DebugFlag    = "debug"
+	DebugUsage   = "Set Default for more information on the nexus script execution"
+	VerboseFlag  = "verbose"
+	VerboseUsage = "Set Verbose for detailed http request and response logs"
+
+	ScriptTaskUsage = "Script Task (Required)  (For all tasks the script(s) should exist under the path ./scripts/groovy)\n\n" +
+		"    list 	    List all the scripts available in Nexus. script-name (Optional) If script-name is passed the contents of the script will be printed\n" +
+		"    add  	    Add a new script to nexus. script-name (Required)\n" +
+		"    update 	    Update a script that is available in nexus. script-name (Required)\n" +
+		"    add-or-update   Add or Update a script in nexus. script-name (Required)\n" +
+		"    delete          Delete a script from nexus. script-name (Required)\n" +
+		"    run 	    Run/Execute a script in nexus. Required Parameter: script-name\n"
+
+	ScriptNameFlag     = "script-name"
+	ScriptNameUsage    = "Name of the script to be executed in nexus. The script should exist under the path ./scripts/groovy"
+	ScriptPayloadFlag  = "payload"
+	ScriptPayloadUsage = "Arguments to be passed to a nexus script can be sent as a payload during script execution"
+
+	RepoTaskUsage = "Repo Task (Required)\n\n" +
+		"    list   		List all the repositories in nexus.\n" +
+		"			(Optional - repo-name) If repo-name is passed the list command will get the details of the repository.\n" +
+		"			(Optional - repo-format) If repo-format is passed the list command will list the repositories as per the format\n" +
+		"    create-hosted	Create a hosted repository in nexus. (Required - repo-name and repo-format)\n" +
+		"    create-proxy	Create a proxy repository in nexus. (Required - repo-name, repo-format and remote-url ) (Optional - proxy-user and proxy-pass)\n" +
+		"    create-group	Create a group repository in nexus. (Required - repo-name,repo-format and repo-members)\n" +
+		"    add-group-members	Add new members to a existing group repository. (Required - repo-name,repo-format and repo-members)\n" +
+		"    delete		Delete a repository from nexus\n\n" +
+		"    If you are creating a docker repository it is necessary to also provide either a docker-http-port or a docker-https-port or both.\n"
+
+	RepoNameFlag         = "repo-name"
+	RepoNameUsage        = "Nexus repository name"
+	RepoFormatFlag       = "repo-format"
+	RepoFormatUsage      = "Repository format. Available formats : %+q"
+	RemoteURLFlag        = "remote-url"
+	RemoteURLUsage       = "Remote URL to be proxied in nexus"
+	RepoMembersFlag      = "repo-members"
+	RepoMembersUsage     = "Comma-separated repository names that should be added to a group repo"
+	ProxyUserFlag        = "proxy-user"
+	ProxyUserUsage       = "Username for accessing the proxy repository"
+	ProxyPassFlag        = "proxy-pass"
+	ProxyPassUsage       = "Password for accessing the proxy repository"
+	DockerHttpPortFlag   = "docker-http-port"
+	DockerHttpPortUsage  = "Docker HTTP port"
+	DockerHttpsPortFlag  = "docker-https-port"
+	DockerHttpsPortUsage = "Docker HTTPs port"
+	BlobStoreNameFlag    = "blob-store-name"
+	BlobStoreNameUsage   = "Blob store name"
+	ReleaseFlag          = "releases"
+	ReleaseUsage         = "Set this flag to create a releases repository"
+
+	// Info
+	connDetailsSuccessInfo = "Connection details were stored successfully in the file ./%s\n"
+	connDetailsEmptyInfo   = "Server connection details are not set...First Run %q to set the connection details\n"
+	TaskEmptyInfo          = "You need to select a task to be performed. Available tasks : %+q\n"
+	TaskNotValidInfo       = "%q is not a valid %s task. Available tasks : %+q\n"
 	scriptNameRequiredInfo = "script-name is a required parameter"
+	RepoFormatNotValidInfo = "%q is not a valid repository format. Available repository formats are : %v\n"
 	repoNameRequiredInfo   = "repo-name is a required parameter"
 	repoFormatRequiredInfo = "repo-format is a required parameter"
 	hostedRepoRequiredInfo = "repo-name and repo-format are required parameters to create a hosted repository"

@@ -198,11 +198,12 @@ func getRepositories() []m.Repository {
 	var repositories []m.Repository
 	req := createBaseRequest("GET", url, m.RequestBody{})
 	respBody, status := httpRequest(req)
-	err := json.Unmarshal(respBody, &repositories)
-	logError(err, "Get Repositories : JSON Unmarshal Error")
 	if status != "200 OK" {
 		log.Printf("%s : %s", getfuncName(), setVerboseInfo)
 		os.Exit(1)
+	} else {
+		err := json.Unmarshal(respBody, &repositories)
+		logError(err, "Get Repositories : JSON Unmarshal Error")
 	}
 	return repositories
 }
