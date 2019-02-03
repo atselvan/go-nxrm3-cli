@@ -13,6 +13,7 @@ if (repository.getRepositoryManager().exists(input.name)){
     output.put("type", repo.type.value)
     output.put("format", repo.format.value)
     output.put("recipe", repo.configuration.recipeName)
+    output.put("attributes", repo.configuration.attributes)
 } else {
     output.put("status", "404 Not Found")
 }

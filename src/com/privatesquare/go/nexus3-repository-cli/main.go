@@ -141,8 +141,6 @@ func main() {
 		switch *repoTask {
 		case "list":
 			b.ListRepositories(*repoName, *repoFormat)
-		case "get-attributes":
-			b.GetRepositoryAttributes(*repoName)
 		case "create-hosted":
 			b.CreateHosted(*repoName, *blobStoreName, *repoFormat, *dockerHttpPort, *dockerHttpsPort, *releases)
 		case "create-proxy":

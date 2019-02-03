@@ -1,12 +1,12 @@
 package model
 
 type Repository struct {
-	Name      string     `json:"name"`
-	URL       string     `json:"url"`
-	Type      string     `json:"type"`
-	Format    string     `json:"format"`
-	Recipe    string     `json:"recipe"`
-	Attribute Attributes `json:"attributes"`
+	Name       string     `json:"name"`
+	URL        string     `json:"url"`
+	Type       string     `json:"type"`
+	Format     string     `json:"format"`
+	Recipe     string     `json:"recipe"`
+	Attributes Attributes `json:"attributes"`
 }
 
 type Attributes struct {

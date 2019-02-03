@@ -19,26 +19,12 @@ func ListRepositories(repoName, repoFormat string) {
 	} else if repoName == "" && repoFormat == "" {
 		repositoryList = getRepositoryList()
 	} else {
-		repositoryList = getRepositoryListByFormat(repoFormat)
+		repositoryList = getRepositoryListByFormat(validateRepositoryFormat(repoFormat))
 	}
 	if repoName == "" {
 		printStringSlice(repositoryList)
 		fmt.Printf("Number of repositories : %d\n", len(repositoryList))
 	}
-}
-
-func GetRepositoryAttributes(repoName string) {
-	if repoName == "" {
-		log.Printf("%s : %s", getfuncName(), repoNameRequiredInfo)
-		os.Exit(1)
-	}
-	attribute := m.Attributes{Maven: m.Maven{VersionPolicy: "Releases", LayoutPolicy: "Something"}}
-	payload, err := json.Marshal(attribute)
-	logJsonMarshalError(err, getfuncName())
-	SkipTLSVerification = true
-	Verbose = true
-	result := RunScript("get-repo-attributes", string(payload))
-	fmt.Println(result)
 }
 
 func CreateHosted(repoName, blobStoreName, format string, dockerHttpPort, dockerHttpsPort int, releases bool) {
@@ -66,7 +52,7 @@ func CreateHosted(repoName, blobStoreName, format string, dockerHttpPort, docker
 		attributes = m.Attributes{Storage: storage}
 	}
 
-	repository := m.Repository{Name: repoName, Format: format, Recipe: recipe, Attribute: attributes}
+	repository := m.Repository{Name: repoName, Format: format, Recipe: recipe, Attributes: attributes}
 	payload, err := json.Marshal(repository)
 	logJsonMarshalError(err, getfuncName())
 	result := RunScript("create-hosted-repo", string(payload))
@@ -106,7 +92,7 @@ func CreateProxy(repoName, blobStoreName, format, remoteURL, proxyUsername, prox
 		attributes = m.Attributes{Storage: storage, Proxy: proxy, Httpclient: proxyHttpClient, NegativeCache: negetiveCache}
 	}
 
-	repository := m.Repository{Name: repoName, Format: format, Recipe: recipe, Attribute: attributes}
+	repository := m.Repository{Name: repoName, Format: format, Recipe: recipe, Attributes: attributes}
 	payload, err := json.Marshal(repository)
 	logJsonMarshalError(err, getfuncName())
 	result := RunScript("create-proxy-repo", string(payload))
@@ -141,7 +127,7 @@ func CreateGroup(repoName, blobStoreName, format, repoMembers string, dockerHttp
 		attributes = m.Attributes{Storage: storage, Group: group}
 	}
 
-	repository := m.Repository{Name: repoName, Format: format, Recipe: recipe, Attribute: attributes}
+	repository := m.Repository{Name: repoName, Format: format, Recipe: recipe, Attributes: attributes}
 	payload, err := json.Marshal(repository)
 	logJsonMarshalError(err, getfuncName())
 	result := RunScript("create-group-repo", string(payload))
@@ -171,7 +157,7 @@ func getRepository(repoName string) m.Repository {
 		log.Printf("%s : %s", getfuncName(), setVerboseInfo)
 		os.Exit(1)
 	}
-	return m.Repository{Name: result.Name, Recipe: result.Recipe, URL: result.URL}
+	return m.Repository{Name: result.Name, URL: result.URL, Type: result.Type, Format: result.Format, Recipe: result.Recipe, Attributes: result.Attributes}
 }
 
 func getRepositories() []m.Repository {
@@ -197,6 +183,17 @@ func getRepositoryList() []string {
 	return repositoryList
 }
 
+func getRepositoryListByFormat(repoFormat string) []string {
+	var repositoryList []string
+	repositories := getRepositories()
+	for _, r := range repositories {
+		if repoFormat == r.Format {
+			repositoryList = append(repositoryList, r.Name)
+		}
+	}
+	return repositoryList
+}
+
 func repositoryExists(repoName string) bool {
 	if repoName == "" {
 		log.Printf("%s : %s", getfuncName(), repoNameRequiredInfo)
@@ -215,17 +212,6 @@ func repositoryExists(repoName string) bool {
 		os.Exit(1)
 	}
 	return isExists
-}
-
-func getRepositoryListByFormat(repoFormat string) []string {
-	var repositoryList []string
-	repositories := getRepositories()
-	for _, r := range repositories {
-		if repoFormat == r.Format {
-			repositoryList = append(repositoryList, r.Name)
-		}
-	}
-	return repositoryList
 }
 
 func getBlobStoreName(blobStoreName string) string {
