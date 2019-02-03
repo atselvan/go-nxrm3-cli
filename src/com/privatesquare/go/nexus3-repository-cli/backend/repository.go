@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	regexp2 "regexp"
+	"strings"
 )
 
 func ListRepositories(repoName, repoFormat string) {
@@ -109,6 +110,41 @@ func CreateProxy(repoName, blobStoreName, format, remoteURL, proxyUsername, prox
 	payload, err := json.Marshal(repository)
 	logJsonMarshalError(err, getfuncName())
 	result := RunScript("create-proxy-repo", string(payload))
+	printCreateRepoStatus(repoName, result.Status)
+}
+
+func CreateGroup(repoName, blobStoreName, format, repoMembers string, dockerHttpPort, dockerHttpsPort int, releases bool) {
+	if repoName == "" || repoMembers == "" || format == "" {
+		log.Printf("%s : %s", getfuncName(), groupRequiredInfo)
+		os.Exit(1)
+	}
+	format = validateRepositoryFormat(format)
+	validList := validateGroupMembers(repoMembers, format)
+
+	var attributes m.Attributes
+	recipe := fmt.Sprintf("%s-group", format)
+	storage := m.Storage{BlobStoreName: getBlobStoreName(blobStoreName), StrictContentTypeValidation: true, WritePolicy: getWritePolicy(releases)}
+	group := m.Group{MemberNames: validList}
+
+	if format == "maven2" {
+		maven := m.Maven{VersionPolicy: getVersionPolicy(releases), LayoutPolicy: "STRICT"}
+		attributes = m.Attributes{Storage: storage, Maven: maven, Group: group}
+	} else if format == "docker" {
+		if dockerHttpPort == 0 && dockerHttpsPort == 0 {
+			log.Printf("%s : %s", getfuncName(), dockerPortsInfo)
+			os.Exit(1)
+		}
+		docker := m.Docker{HTTPPort: dockerHttpPort, HTTPSPort: dockerHttpsPort, ForceBasicAuth: true, V1Enabled: false}
+		attributes = m.Attributes{Storage: storage, Docker: docker, Group: group}
+	} else {
+		storage := m.Storage{BlobStoreName: getBlobStoreName(blobStoreName), StrictContentTypeValidation: true, WritePolicy: getWritePolicy(releases)}
+		attributes = m.Attributes{Storage: storage, Group: group}
+	}
+
+	repository := m.Repository{Name: repoName, Format: format, Recipe: recipe, Attribute: attributes}
+	payload, err := json.Marshal(repository)
+	logJsonMarshalError(err, getfuncName())
+	result := RunScript("create-group-repo", string(payload))
 	printCreateRepoStatus(repoName, result.Status)
 }
 
@@ -258,6 +294,28 @@ func validateRemoteURL(url string) {
 		log.Printf("%s : %q is an invalid url. URL must begin with either http:// or https://\n", getfuncName(), url)
 		os.Exit(1)
 	}
+}
+
+func validateGroupMembers(repoMembers, format string) []string {
+	var validList []string
+	repoMembersList := strings.Split(strings.Replace(repoMembers, " ", "", -1), ",")
+	for _, repoMember := range repoMembersList {
+		if repositoryExists(repoMember) {
+			repoDetails := getRepository(repoMember)
+			if strings.Contains(repoDetails.Recipe, format) {
+				validList = append(validList, repoMember)
+			} else {
+				log.Printf("Repository %q is not a %q format repository, hence it cannot be added to the group repository\n", repoMember, format)
+			}
+		} else {
+			log.Printf("Repository %q was not found, hence it cannot be added to the group repository\n", repoMember)
+		}
+	}
+	if len(validList) < 1 {
+		log.Printf("%s : Atleast one valid group member should be provided to create a group repository", getfuncName())
+		os.Exit(1)
+	}
+	return validList
 }
 
 func printCreateRepoStatus(repoName, status string) {

@@ -20,7 +20,7 @@ const (
 	repoFormatRequiredInfo = "repo-format is a required parameter"
 	hostedRepoRequiredInfo = "repo-name and repo-format are required parameters to create a hosted repository"
 	proxyRepoRequiredInfo  = "repo-name, repo-format and remote-url are required parameters to create a proxy repository"
-	groupRequiredInfo      = "repo-name and repo-members are required parameters"
+	groupRequiredInfo      = "repo-name, repo-format and repo-members are required parameters"
 	dockerPortsInfo        = "You need to specify either a http port or a https port or both for creating a docker repository"
 	setVerboseInfo         = "There was an error calling the function. Set verbose flag for more information"
 )

@@ -38,7 +38,7 @@ func main() {
 	dockerHttpsPort := repoCommand.Int("docker-https-port", 0, "Docker HTTPs port")
 	blobStoreName := repoCommand.String("blob-store-name", "", "Blob store name.")
 	releases := repoCommand.Bool("releases", false, "Set this flag to create a releases repository.")
-	//repoMembers := repoCommand.String("repo-members", "", "Comma-separated repository names that should be added to a group repo.")
+	repoMembers := repoCommand.String("repo-members", "", "Comma-separated repository names that should be added to a group repo.")
 	rcSkipTLS := repoCommand.Bool("skip-tls", false, "Skip TLS verification for the nexus server instance.")
 	rcDebug := repoCommand.Bool("debug", false, "Set Default for more information on the nexus script execution.")
 	rcVerbose := repoCommand.Bool("verbose", false, "Set Verbose for detailed http request and response logs.")
@@ -147,6 +147,8 @@ func main() {
 			b.CreateHosted(*repoName, *blobStoreName, *repoFormat, *dockerHttpPort, *dockerHttpsPort, *releases)
 		case "create-proxy":
 			b.CreateProxy(*repoName, *blobStoreName, *repoFormat, *remoteURL, *proxyUser, *proxyPass, *dockerHttpPort, *dockerHttpsPort, *releases)
+		case "create-group":
+			b.CreateGroup(*repoName, *blobStoreName, *repoFormat, *repoMembers, *dockerHttpPort, *dockerHttpsPort, *releases)
 		case "delete":
 			b.DeleteRepository(*repoName)
 		default:
