@@ -8,10 +8,16 @@ import (
 	"os"
 )
 
-func ListSelectors() {
-	csNames := getSelectorNames()
-	printStringSlice(csNames)
-	fmt.Printf("Total Number of content selectors : %d\n", len(csNames))
+func ListSelectors(name string) {
+	if name != "" {
+		cs := getSelector(name)
+		fmt.Printf("Name: %s\nDescription: %s\nExpression: %s\n",
+			cs.Name,cs.Description,cs.Attributes.Expression)
+	} else {
+		csNames := getSelectorNames()
+		printStringSlice(csNames)
+		fmt.Printf("Total Number of content selectors : %d\n", len(csNames))
+	}
 }
 
 func CreateSelector(name, description, expression string) {
@@ -105,7 +111,7 @@ func getSelector(name string) m.ContentSelector {
 		}
 	}
 	if contentSelector.Name == "" {
-		log.Printf("not found")
+		log.Printf(selectorNotFoundInfo, name)
 		os.Exit(1)
 	}
 	return contentSelector

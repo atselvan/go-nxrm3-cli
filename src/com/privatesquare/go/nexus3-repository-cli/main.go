@@ -190,7 +190,7 @@ func main() {
 		// run tasks
 		switch *selectorTask {
 		case "list":
-			b.ListSelectors()
+			b.ListSelectors(*selectorName)
 		case "create":
 			b.CreateSelector(*selectorName, *selectorDesc, *expression)
 		case "update":
