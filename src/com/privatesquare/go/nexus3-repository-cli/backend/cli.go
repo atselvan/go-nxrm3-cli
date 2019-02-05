@@ -102,3 +102,32 @@ func PrintRepoCommandUsage(fs *flag.FlagSet) {
 			VerboseFlag, VerboseUsage)
 	}
 }
+
+func PrintSelectorCommandUsage(fs *flag.FlagSet) {
+	fs.Usage = func() {
+		fmt.Printf("Usage: nexus3-repository-cli selector [args] [options]\n\n")
+		fmt.Printf("[args]\n\n  "+
+			"-%s string\t%s\n  "+
+			"-%s string\n\t%s\n  -%s string\n\t%s\n  -%s string\n\t%s\n"+
+			"\n[options]\n\n  -%s\n\t%s\n  -%s\n\t%s\n  -%s\n\t%s\n\n",
+			TaskFlag, SelectorTaskUsage,
+			SelectorNameFlag, SelectorNameUsage,
+			SelectorDescFlag, SelectorDescUsage,
+			SelectorExpressionFlag, SelectorExpressionUsage,
+			SkipTlsFlag, SkipTlsUsage,
+			DebugFlag, DebugUsage,
+			VerboseFlag, VerboseUsage)
+	}
+}
+
+func PrintPrivilegeCommandUsage(fs *flag.FlagSet) {
+	fs.Usage = func() {
+		fmt.Printf("Usage: nexus3-repository-cli privilege [args] [options]\n\n")
+	}
+}
+
+func PrintRoleCommandUsage(fs *flag.FlagSet) {
+	fs.Usage = func() {
+		fmt.Printf("Usage: nexus3-repository-cli role [args] [options]\n\n")
+	}
+}

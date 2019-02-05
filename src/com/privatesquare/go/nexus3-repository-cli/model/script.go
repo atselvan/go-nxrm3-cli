@@ -12,12 +12,13 @@ type ScriptOutput struct {
 }
 
 type ScriptResult struct {
-	Status     string     `json:"status"`
-	Name       string     `json:"name"`
-	URL        string     `json:"url"`
-	Type       string     `json:"type"`
-	Format     string     `json:"format"`
-	Recipe     string     `json:"recipe"`
-	Message    string     `json:"message"`
-	Attributes Attributes `json:"attributes"`
+	Status           string            `json:"status"`
+	Name             string            `json:"name"`
+	URL              string            `json:"url"`
+	Type             string            `json:"type"`
+	Format           string            `json:"format"`
+	Recipe           string            `json:"recipe"`
+	Message          string            `json:"message"`
+	Attributes       Attributes        `json:"attributes"`
+	ContentSelectors []ContentSelector `json:"contentSelectors"`
 }

@@ -14,6 +14,9 @@ func main() {
 	confCommand := flag.NewFlagSet(b.ConfCommandFlag, flag.ExitOnError)
 	scriptCommand := flag.NewFlagSet(b.ScriptCommandFlag, flag.ExitOnError)
 	repoCommand := flag.NewFlagSet(b.RepoCommandFlag, flag.ExitOnError)
+	selectorCommand := flag.NewFlagSet(b.SelectorCommandFlag, flag.ExitOnError)
+	privilegeCommand := flag.NewFlagSet(b.PrivilegeCommandFlag, flag.ExitOnError)
+	roleCommand := flag.NewFlagSet(b.RoleCommandFlag, flag.ExitOnError)
 	// conf flags
 	nexusURL := confCommand.String(b.NexusURLFlag, "", b.NexusURLUsage)
 	username := confCommand.String(b.NexusUsernameFlag, "", b.NexusUsernameUsage)
@@ -40,9 +43,16 @@ func main() {
 	rcSkipTLS := repoCommand.Bool(b.SkipTlsFlag, false, b.SkipTlsUsage)
 	rcDebug := repoCommand.Bool(b.DebugFlag, false, b.DebugUsage)
 	rcVerbose := repoCommand.Bool(b.VerboseFlag, false, b.VerboseUsage)
+	// selector flags
+	selectorTask := selectorCommand.String(b.TaskFlag, "", "")
+	selectorName := selectorCommand.String(b.SelectorNameFlag, "", b.SelectorNameUsage)
+	selectorDesc := selectorCommand.String(b.SelectorDescFlag, "", b.SelectorDescUsage)
+	expression := selectorCommand.String(b.SelectorExpressionFlag, "", b.SelectorExpressionUsage)
+	csSkipTLS := selectorCommand.Bool(b.SkipTlsFlag, false, b.SkipTlsUsage)
+	csDebug := selectorCommand.Bool(b.DebugFlag, false, b.DebugUsage)
+	csVerbose := selectorCommand.Bool(b.VerboseFlag, false, b.VerboseUsage)
 
 	b.Usage()
-
 	flag.Parse()
 
 	if len(os.Args) < 2 {
@@ -60,6 +70,15 @@ func main() {
 	case "repo":
 		b.PrintRepoCommandUsage(repoCommand)
 		repoCommand.Parse(os.Args[2:])
+	case "selector":
+		b.PrintSelectorCommandUsage(selectorCommand)
+		selectorCommand.Parse(os.Args[2:])
+	case "privilege":
+		b.PrintPrivilegeCommandUsage(privilegeCommand)
+		privilegeCommand.Parse(os.Args[2:])
+	case "role":
+		b.PrintRoleCommandUsage(roleCommand)
+		roleCommand.Parse(os.Args[2:])
 	default:
 		flag.Usage()
 		os.Exit(1)
@@ -77,7 +96,7 @@ func main() {
 	}
 
 	if scriptCommand.Parsed() {
-		// Required Flags
+		// Required flags
 		if *scriptTask == "" {
 			scriptCommand.Usage()
 			log.Printf(b.TaskEmptyInfo, b.ScriptTasks)
@@ -115,7 +134,7 @@ func main() {
 	}
 
 	if repoCommand.Parsed() {
-		// Required Flags
+		// Required flags
 		if *repoTask == "" {
 			repoCommand.Usage()
 			log.Printf(b.TaskEmptyInfo, b.RepoTasks)
@@ -152,6 +171,35 @@ func main() {
 		default:
 			repoCommand.Usage()
 			log.Printf(b.TaskNotValidInfo, *repoTask, "repo", b.RepoTasks)
+			os.Exit(1)
+		}
+	}
+
+	if selectorCommand.Parsed() {
+		// Required flags
+		if *selectorTask == "" {
+			selectorCommand.Usage()
+			log.Printf(b.TaskEmptyInfo, b.SelectorTasks)
+			os.Exit(1)
+		}
+		// set global variables
+		b.SetConnectionDetails()
+		b.SkipTLSVerification = *csSkipTLS
+		b.Debug = *csDebug
+		b.Verbose = *csVerbose
+		// run tasks
+		switch *selectorTask {
+		case "list":
+			b.ListSelectors()
+		case "create":
+			b.CreateSelector(*selectorName, *selectorDesc, *expression)
+		case "update":
+			b.UpdateSelector(*selectorName, *selectorDesc, *expression)
+		case "delete":
+			b.DeleteSelector(*selectorName)
+		default:
+			selectorCommand.Usage()
+			log.Printf(b.TaskNotValidInfo, *selectorTask, "selector", b.SelectorTasks)
 			os.Exit(1)
 		}
 	}
