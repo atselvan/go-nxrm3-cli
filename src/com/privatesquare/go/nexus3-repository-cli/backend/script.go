@@ -9,9 +9,9 @@ import (
 	"sort"
 )
 
-func ListScripts(scriptName string) {
-	if scriptName != "" {
-		script := getScript(scriptName)
+func ListScripts(name string) {
+	if name != "" {
+		script := getScript(name)
 		fmt.Println(script)
 	} else {
 		scriptsList := getScripts()
@@ -25,39 +25,39 @@ func ListScripts(scriptName string) {
 	}
 }
 
-func AddOrUpdateScript(scriptName string) {
-	if scriptName == "" {
+func AddOrUpdateScript(name string) {
+	if name == "" {
 		log.Printf("%s : %s", getfuncName(), scriptNameRequiredInfo)
 		os.Exit(1)
 	}
-	if !scriptExists(scriptName) {
-		AddScript(scriptName)
+	if !scriptExists(name) {
+		AddScript(name)
 	} else {
-		UpdateScript(scriptName)
+		UpdateScript(name)
 	}
 }
 
-func AddScript(scriptName string) {
-	if scriptName == "" {
+func AddScript(name string) {
+	if name == "" {
 		log.Printf("%s : %s", getfuncName(), scriptNameRequiredInfo)
 		os.Exit(1)
 	}
 	url := fmt.Sprintf("%s/%s/%s", NexusURL, apiBase, scriptAPI)
-	if !scriptExists(scriptName) {
-		payload, err := json.Marshal(m.Script{Name: scriptName, Type: "groovy", Content: readFile(getScriptPath(scriptName))})
+	if !scriptExists(name) {
+		payload, err := json.Marshal(m.Script{Name: name, Type: "groovy", Content: readFile(getScriptPath(name))})
 		logJsonMarshalError(err, getfuncName())
 		req := createBaseRequest("POST", url, m.RequestBody{Json: payload})
 		_, status := httpRequest(req)
 		if status == "204 No Content" {
 			if Debug {
-				log.Printf("The script %q is added to nexus\n", scriptName)
+				log.Printf("The script %q is added to nexus\n", name)
 			}
 		} else {
 			log.Printf("%s : %s", getfuncName(), setVerboseInfo)
 			os.Exit(1)
 		}
 	} else {
-		log.Printf("The script %q already exists in nexus\n", scriptName)
+		log.Printf("The script %q already exists in nexus\n", name)
 	}
 }
 

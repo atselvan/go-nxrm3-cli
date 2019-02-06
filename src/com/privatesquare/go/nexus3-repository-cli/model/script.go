@@ -21,4 +21,5 @@ type ScriptResult struct {
 	Message          string            `json:"message"`
 	Attributes       Attributes        `json:"attributes"`
 	ContentSelectors []ContentSelector `json:"contentSelectors"`
+	Privileges       []Privilege       `json:"privileges"`
 }

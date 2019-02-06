@@ -10,6 +10,8 @@ import (
 
 func main() {
 
+	// TODO: validate if all elements are created with lower case
+
 	// subcommands
 	confCommand := flag.NewFlagSet(b.ConfCommandFlag, flag.ExitOnError)
 	scriptCommand := flag.NewFlagSet(b.ScriptCommandFlag, flag.ExitOnError)
@@ -51,6 +53,16 @@ func main() {
 	csSkipTLS := selectorCommand.Bool(b.SkipTlsFlag, false, b.SkipTlsUsage)
 	csDebug := selectorCommand.Bool(b.DebugFlag, false, b.DebugUsage)
 	csVerbose := selectorCommand.Bool(b.VerboseFlag, false, b.VerboseUsage)
+	//privilegeFlags
+	privilegeTask := privilegeCommand.String(b.TaskFlag, "", b.PrivilegeTaskUsage)
+	privilegeName := privilegeCommand.String(b.PrivilegeNameFlag, "", b.PrivilegeNameUsage)
+	pSelectorName := privilegeCommand.String(b.PSelectorNameFlag, "", b.SelectorNameUsage)
+	privilegeDesc := privilegeCommand.String(b.PrivilegeDescFlag, "", b.PrivilegeDescUsage)
+	pRepoName := privilegeCommand.String(b.PRepoNameFlag, "", b.RepoNameUsage)
+	action := privilegeCommand.String(b.ActionFlag, "", b.ActionUsage)
+	pSkipTLS := privilegeCommand.Bool(b.SkipTlsFlag, false, b.SkipTlsUsage)
+	pDebug := privilegeCommand.Bool(b.DebugFlag, false, b.DebugUsage)
+	pVerbose := privilegeCommand.Bool(b.VerboseFlag, false, b.VerboseUsage)
 
 	b.Usage()
 	flag.Parse()
@@ -200,6 +212,35 @@ func main() {
 		default:
 			selectorCommand.Usage()
 			log.Printf(b.TaskNotValidInfo, *selectorTask, "selector", b.SelectorTasks)
+			os.Exit(1)
+		}
+	}
+
+	if privilegeCommand.Parsed() {
+		// Required flags
+		if *privilegeTask == "" {
+			privilegeCommand.Usage()
+			log.Printf(b.TaskEmptyInfo, b.PrivilegeTasks)
+			os.Exit(1)
+		}
+		// set global variables
+		b.SetConnectionDetails()
+		b.SkipTLSVerification = *pSkipTLS
+		b.Debug = *pDebug
+		b.Verbose = *pVerbose
+		// run tasks
+		switch *privilegeTask {
+		case "list":
+			b.ListPrivileges(*privilegeName)
+		case "create":
+			b.CreatePrivilege(*privilegeName, *privilegeDesc, *pSelectorName, *pRepoName, *action)
+		case "update":
+			b.UpdatePrivilege(*privilegeName, *privilegeDesc, *pSelectorName, *pRepoName, *action)
+		case "delete":
+			b.DeletePrivilege(*privilegeName)
+		default:
+			selectorCommand.Usage()
+			log.Printf(b.TaskNotValidInfo, *privilegeTask, "privilege", b.PrivilegeTasks)
 			os.Exit(1)
 		}
 	}

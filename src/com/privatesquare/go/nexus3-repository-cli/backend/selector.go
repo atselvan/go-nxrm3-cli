@@ -12,7 +12,7 @@ func ListSelectors(name string) {
 	if name != "" {
 		cs := getSelector(name)
 		fmt.Printf("Name: %s\nDescription: %s\nExpression: %s\n",
-			cs.Name,cs.Description,cs.Attributes.Expression)
+			cs.Name, cs.Description, cs.Attributes.Expression)
 	} else {
 		csNames := getSelectorNames()
 		printStringSlice(csNames)
@@ -128,10 +128,8 @@ func getSelectorNames() []string {
 
 func selectorExists(name string) bool {
 	csNames := getSelectorNames()
-	for _, csName := range csNames {
-		if csName == name {
-			return true
-		}
+	if entryExists(csNames, name) {
+		return true
 	}
 	return false
 }

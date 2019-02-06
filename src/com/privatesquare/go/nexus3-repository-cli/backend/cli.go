@@ -42,11 +42,17 @@ func Usage() {
 		fmt.Printf("Usage: nexus3-repository-cli [command]\n\n")
 		fmt.Printf("[commands]\n  %s\t"+
 			"%s\n  %s  \t"+
+			"%s\n  %s  \t"+
+			"%s\n  %s  \t"+
+			"%s\n  %s  \t"+
 			"%s\n  %s  \t%s"+
 			"\n\n",
 			ConfCommandFlag, ConfCommandUsage,
 			ScriptCommandFlag, ScriptCommandUsage,
-			RepoCommandFlag, RepoCommandUsage)
+			RepoCommandFlag, RepoCommandUsage,
+			SelectorCommandFlag, SelectorCommandUsage,
+			PrivilegeCommandFlag, PrivilegeCommandUsage,
+			RoleCommandFlag, RoleCommandUsage)
 	}
 }
 
@@ -123,6 +129,20 @@ func PrintSelectorCommandUsage(fs *flag.FlagSet) {
 func PrintPrivilegeCommandUsage(fs *flag.FlagSet) {
 	fs.Usage = func() {
 		fmt.Printf("Usage: nexus3-repository-cli privilege [args] [options]\n\n")
+		fmt.Printf("[args]\n\n  "+
+			"-%s string\t%s\n  -%s string\n\t%s\n  "+
+			"-%s string\n\t%s\n  -%s string\n\t%s\n  "+
+			"-%s string\n\t%s\n  -%s string\n\t%s\n"+
+			"\n[options]\n\n  -%s\n\t%s\n  -%s\n\t%s\n  -%s\n\t%s\n\n",
+			TaskFlag, PrivilegeTaskUsage,
+			PrivilegeNameFlag, PrivilegeNameUsage,
+			PrivilegeDescFlag, PrivilegeDescUsage,
+			PSelectorNameFlag, SelectorNameUsage,
+			PRepoNameFlag, RepoNameUsage,
+			ActionFlag, fmt.Sprintf(ActionUsage, PrivilegeActions),
+			SkipTlsFlag, SkipTlsUsage,
+			DebugFlag, DebugUsage,
+			VerboseFlag, VerboseUsage)
 	}
 }
 

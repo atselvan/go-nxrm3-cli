@@ -29,7 +29,7 @@ const (
 	RoleCommandFlag       = "role"
 	RoleCommandUsage      = "Nexus role operations"
 
-	//configure constants
+	//configure
 	NexusURLFlag       = "nexus-url"
 	NexusURLUsage      = "Nexus 3 server URL. (Required)"
 	NexusUsernameFlag  = "username"
@@ -37,6 +37,10 @@ const (
 	NexusPasswordFlag  = "password"
 	NexusPasswordUsage = "Nexus 3 server login password. (Required)"
 
+	connDetailsSuccessInfo = "Connection details were stored successfully in the file ./%s\n"
+	connDetailsEmptyInfo   = "Server connection details are not set...First Run %q to set the connection details\n"
+
+	//common
 	TaskFlag     = "task"
 	SkipTlsFlag  = "skip-tls"
 	SkipTlsUsage = "Skip TLS verification for the nexus server instance"
@@ -45,29 +49,33 @@ const (
 	VerboseFlag  = "verbose"
 	VerboseUsage = "Set Verbose for detailed http request and response logs"
 
-	connDetailsSuccessInfo = "Connection details were stored successfully in the file ./%s\n"
-	connDetailsEmptyInfo   = "Server connection details are not set...First Run %q to set the connection details\n"
-	TaskEmptyInfo          = "You need to select a task to be performed. Available tasks : %+q\n"
-	TaskNotValidInfo       = "%q is not a valid %s task. Available tasks : %+q\n"
-	setVerboseInfo         = "There was an error calling the function. Set verbose flag for more information"
+	TaskEmptyInfo    = "You need to select a task to be performed. Available tasks : %+q\n"
+	TaskNotValidInfo = "%q is not a valid %s task. Available tasks : %+q\n"
+	setVerboseInfo   = "There was an error calling the function. Set verbose flag for more information"
 
-	//script constants
+	//script
 	ScriptTaskUsage = "Script Task (Required)  (For all tasks the script(s) should exist under the path ./scripts/groovy)\n\n" +
-		"    list 	    List all the scripts available in Nexus. script-name (Optional) If script-name is passed the contents of the script will be printed\n" +
-		"    add  	    Add a new script to nexus. script-name (Required)\n" +
-		"    update 	    Update a script that is available in nexus. script-name (Required)\n" +
-		"    add-or-update   Add or Update a script in nexus. script-name (Required)\n" +
-		"    delete          Delete a script from nexus. script-name (Required)\n" +
-		"    run 	    Run/Execute a script in nexus. Required Parameter: script-name\n"
+		"    list 	    List all the scripts available in Nexus. (Optional: name) If script name is passed the contents of the script will be printed\n" +
+		"    add  	    Add a new script to nexus. (Required: name)\n" +
+		"    update 	    Update a script that is available in nexus. (Required: name)\n" +
+		"    add-or-update   Add or Update a script in nexus. (Required: name)\n" +
+		"    delete          Delete a script from nexus. (Required: name)\n" +
+		"    run 	    Run/Execute a script in nexus. (Required: name)(Optional: payload)\n"
 
-	ScriptNameFlag     = "script-name"
-	ScriptNameUsage    = "Name of the script to be executed in nexus. The script should exist under the path ./scripts/groovy"
+	ScriptNameFlag     = "name"
+	ScriptNameUsage    = "Name of the script to be executed in nexus"
 	ScriptPayloadFlag  = "payload"
 	ScriptPayloadUsage = "Arguments to be passed to a nexus script can be sent as a payload during script execution"
 
-	scriptNameRequiredInfo = "script-name is a required parameter"
+	scriptNameRequiredInfo = "name is a required parameter"
 
-	//repo constants
+	//script name
+	getPrivilegesScript   = "get-privileges"
+	createPrivilegeScript = "create-privilege"
+	updatePrivilegeScript = "update-privilege"
+	deletePrivilegeScript = "delete-privilege"
+
+	//repo
 	RepoTaskUsage = "Repo Task (Required)\n\n" +
 		"    list   		List all the repositories in nexus.\n" +
 		"			(Optional - repo-name) If repo-name is passed the list command will get the details of the repository.\n" +
@@ -107,8 +115,9 @@ const (
 	proxyRepoRequiredInfo  = "repo-name, repo-format and remote-url are required parameters to create a proxy repository"
 	groupRequiredInfo      = "repo-name, repo-format and repo-members are required parameters"
 	dockerPortsInfo        = "You need to specify either a http port or a https port or both for creating a docker repository"
+	repositoryNotFoundInfo = "Repository %q was not found in nexus"
 
-	//selector constants
+	//selector
 	contentSelectorType = "csel"
 
 	SelectorTaskUsage = "Selector Task (Required)\n\n" +
@@ -118,9 +127,9 @@ const (
 		"    delete          Delete a content selector (Required: name)\n"
 
 	SelectorNameFlag        = "name"
-	SelectorNameUsage       = "Content Selector Name"
+	SelectorNameUsage       = "Content Selector name"
 	SelectorDescFlag        = "description"
-	SelectorDescUsage       = "Content Selector Description"
+	SelectorDescUsage       = "Content Selector description"
 	SelectorExpressionFlag  = "expression"
 	SelectorExpressionUsage = "Pattern expression for the content selector"
 
@@ -131,4 +140,28 @@ const (
 	deleteSelectorSuccessInfo  = "Content selector %q was deleted\n"
 	selectorAlreadyExistsInfo  = "Content selector %q already exists in nexus\n"
 	selectorNotFoundInfo       = "Content selector %q was not found in nexus\n"
+
+	//privilege
+	PrivilegeTaskUsage = "Privilege Task (Required)\n\n" +
+		"    list 	    List all the privileges in nexus (Optional: name)\n" +
+		"    create  	    Create a Privilege in nexus (Required: name, selector-name and repo-name) (Optional: description and action)\n" +
+		"    update 	    Update the details of a Privilege. (Required: name and expression)\n" +
+		"    delete          Delete a Privilege (Required: name)\n"
+
+	PrivilegeNameFlag  = "name"
+	PrivilegeNameUsage = "Privilege name"
+	PSelectorNameFlag  = "selector-name"
+	PRepoNameFlag      = "repo-name"
+	ActionFlag         = "action"
+	ActionUsage        = "Privilege Action. Available actions %+q"
+	PrivilegeDescFlag  = "description"
+	PrivilegeDescUsage = "Privilege description"
+
+	privilegeNameRequiredInfo   = "name is a required parameter"
+	privilegeNotFoundInfo       = "Privilege %q was not found in nexus\n"
+	privilegeExistsInfo         = "Privilege %q already exists\n"
+	createPrivilegeRequiredInfo = "name, selector-name and repo-name are required parameters"
+	createPrivilegeSuccessInfo  = "Privilege %q is created"
+	updatePrivilegeSuccessInfo  = "Privilege %q is updated"
+	deletePrivilegeSuccessInfo  = "Privilege %q is deleted"
 )
