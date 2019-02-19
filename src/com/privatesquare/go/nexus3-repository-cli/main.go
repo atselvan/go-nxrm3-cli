@@ -10,8 +10,6 @@ import (
 
 func main() {
 
-	// TODO: validate if all elements are created with lower case
-
 	// subcommands
 	confCommand := flag.NewFlagSet(b.ConfCommandFlag, flag.ExitOnError)
 	scriptCommand := flag.NewFlagSet(b.ScriptCommandFlag, flag.ExitOnError)

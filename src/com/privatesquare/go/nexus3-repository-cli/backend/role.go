@@ -32,13 +32,13 @@ func CreateRole(id, description, roleMembers, rolePrivileges string) {
 		log.Printf("%s : %s", getfuncName(), createRoleRequiredInfo)
 		os.Exit(1)
 	}
-	validRoleMembers := validateRoleMembers(id, roleMembers)
-	validRolePrivileges := validateRolePrivileges(rolePrivileges)
-	if len(validRoleMembers)+len(validRolePrivileges) < 1 {
-		log.Printf("%s : You need to provide atleast one valid role member or role privilege during role creation", getfuncName())
-		os.Exit(1)
-	}
 	if !roleExists(id) {
+		validRoleMembers := validateRoleMembers(id, roleMembers)
+		validRolePrivileges := validateRolePrivileges(rolePrivileges)
+		if len(validRoleMembers)+len(validRolePrivileges) < 1 {
+			log.Printf("%s : You need to provide atleast one valid role member or role privilege during role creation", getfuncName())
+			os.Exit(1)
+		}
 		role := m.Role{RoleID: id, Name: id, Description: getRoleDesc(description), Source: getRoleSource(), Roles: validRoleMembers, Privileges: validRolePrivileges}
 		payload, err := json.Marshal(role)
 		logJsonMarshalError(err, jsonMarshalError)

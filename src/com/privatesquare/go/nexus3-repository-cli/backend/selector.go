@@ -30,7 +30,7 @@ func CreateSelector(name, description, expression string) {
 		payload, err := json.Marshal(m.ContentSelector{Name: name, Type: contentSelectorType, Description: getSelectorDescription(description), Attributes: attributes})
 		logJsonMarshalError(err, jsonMarshalError)
 		result := RunScript("create-content-selector", string(payload))
-		if result.Status == "200 OK" {
+		if result.Status == successStatus {
 			log.Printf(createSelectorSuccessInfo, name)
 		} else {
 			log.Printf("%s : %s", getfuncName(), setVerboseInfo)
@@ -58,7 +58,7 @@ func UpdateSelector(name, description, expression string) {
 		payload, err := json.Marshal(selector)
 		logJsonMarshalError(err, jsonMarshalError)
 		result := RunScript("update-content-selector", string(payload))
-		if result.Status == "200 OK" {
+		if result.Status == successStatus {
 			log.Printf(updateSelectorSuccessInfo, name)
 		} else {
 			log.Printf("%s : %s", getfuncName(), setVerboseInfo)
@@ -80,7 +80,7 @@ func DeleteSelector(name string) {
 		payload, err := json.Marshal(selector)
 		logJsonMarshalError(err, jsonMarshalError)
 		result := RunScript("delete-content-selector", string(payload))
-		if result.Status == "200 OK" {
+		if result.Status == successStatus {
 			log.Printf(deleteSelectorSuccessInfo, name)
 		} else {
 			log.Printf("%s : %s", getfuncName(), setVerboseInfo)
@@ -136,7 +136,7 @@ func selectorExists(name string) bool {
 
 func getSelectorDescription(description string) string {
 	if description == "" {
-		return "custom content selector"
+		return defaultContentSelectorDescription
 	}
 	return description
 }

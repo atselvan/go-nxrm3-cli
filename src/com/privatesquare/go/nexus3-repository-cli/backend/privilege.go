@@ -26,10 +26,10 @@ func CreatePrivilege(name, description, selectorName, repoName, action string) {
 	}
 	if !privilegeExists(name) {
 		properties := m.PrivilegeProperties{ContentSelector: validateSelectorForPriv(selectorName), Repository: validateRepoForPriv(repoName), Actions: getPrivilegeActions(action)}
-		payload, err := json.Marshal(m.Privilege{ID: toLower(name), Name: toLower(name), Description: getPrivilegeDescription(description, repoName), Type: getPrivilegeType(), Properties: properties, ReadOnly: false})
+		payload, err := json.Marshal(m.Privilege{ID: toLower(name), Name: toLower(name), Description: getPrivilegeDescription(description), Type: getPrivilegeType(), Properties: properties, ReadOnly: false})
 		logJsonMarshalError(err, jsonMarshalError)
 		result := RunScript(createPrivilegeScript, string(payload))
-		if result.Status == "200 OK" {
+		if result.Status == successStatus {
 			log.Printf(createPrivilegeSuccessInfo, name)
 		}
 	} else {
@@ -59,7 +59,7 @@ func UpdatePrivilege(name, description, selectorName, repoName, action string) {
 		payload, err := json.Marshal(privilege)
 		logJsonMarshalError(err, jsonMarshalError)
 		result := RunScript(updatePrivilegeScript, string(payload))
-		if result.Status == "200 OK" {
+		if result.Status == successStatus {
 			log.Printf(updatePrivilegeSuccessInfo, name)
 		}
 	} else {
@@ -76,7 +76,7 @@ func DeletePrivilege(name string) {
 		payload, err := json.Marshal(m.Privilege{ID: getPrivilegeID(name)})
 		logJsonMarshalError(err, jsonMarshalError)
 		result := RunScript(deletePrivilegeScript, string(payload))
-		if result.Status == "200 OK" {
+		if result.Status == successStatus {
 			log.Printf(deletePrivilegeSuccessInfo, name)
 		}
 	} else {
@@ -135,9 +135,9 @@ func getPrivilegeType() string {
 	return "repository-content-selector"
 }
 
-func getPrivilegeDescription(description, repoName string) string {
+func getPrivilegeDescription(description string) string {
 	if description == "" {
-		return fmt.Sprintf("Custom privilege for repository %s", repoName)
+		return defaultPrivilegeDescription
 	}
 	return description
 }

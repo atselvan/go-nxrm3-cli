@@ -173,13 +173,14 @@ const (
 	SelectorExpressionFlag  = "expression"
 	SelectorExpressionUsage = "Pattern expression for the content selector"
 
-	selectorNameRequiredInfo   = "name is a required parameter"
-	createSelectorRequiredInfo = "name and expression are required parameters"
-	createSelectorSuccessInfo  = "Content selector %q was created\n"
-	updateSelectorSuccessInfo  = "Content selector %q was updated\n"
-	deleteSelectorSuccessInfo  = "Content selector %q was deleted\n"
-	selectorAlreadyExistsInfo  = "Content selector %q already exists in nexus\n"
-	selectorNotFoundInfo       = "Content selector %q was not found in nexus\n"
+	defaultContentSelectorDescription = "Custom content-selector created from the CLI"
+	selectorNameRequiredInfo          = "name is a required parameter"
+	createSelectorRequiredInfo        = "name and expression are required parameters"
+	createSelectorSuccessInfo         = "Content selector %q was created\n"
+	updateSelectorSuccessInfo         = "Content selector %q was updated\n"
+	deleteSelectorSuccessInfo         = "Content selector %q was deleted\n"
+	selectorAlreadyExistsInfo         = "Content selector %q already exists in nexus\n"
+	selectorNotFoundInfo              = "Content selector %q was not found in nexus\n"
 
 	//privilege
 	PrivilegeTaskUsage = "Privilege Task (Required)\n\n" +
@@ -197,6 +198,7 @@ const (
 	PrivilegeDescFlag  = "description"
 	PrivilegeDescUsage = "Privilege description"
 
+	defaultPrivilegeDescription = "Custom privilege created from the CLI"
 	privilegeNameRequiredInfo   = "name is a required parameter"
 	privilegeNotFoundInfo       = "Privilege %q was not found in nexus\n"
 	privilegeExistsInfo         = "Privilege %q already exists\n"
