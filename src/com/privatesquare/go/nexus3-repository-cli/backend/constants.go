@@ -8,8 +8,9 @@ const (
 	scriptAPI      = "v1/script"
 	repositoryPath = "v1/repositories"
 
-	successStatus  = "200 OK"
-	notFoundStatus = "404 Not Found"
+	successStatus   = "200 OK"
+	notFoundStatus  = "404 Not Found"
+	noContentStatus = "204 No Content"
 
 	// Script Path
 	scriptBasePath = "./scripts/groovy"
@@ -66,11 +67,18 @@ const (
 		"    run 	    Run/Execute a script in nexus. (Required: name)(Optional: payload)\n"
 
 	ScriptNameFlag     = "name"
-	ScriptNameUsage    = "Name of the script to be executed in nexus"
+	ScriptNameUsage    = "Name of the script"
 	ScriptPayloadFlag  = "payload"
-	ScriptPayloadUsage = "Arguments to be passed to a nexus script can be sent as a payload during script execution"
+	ScriptPayloadUsage = "Arguments can be passed to a nexus script as a payload during script execution"
 
 	scriptNameRequiredInfo = "name is a required parameter"
+	scriptAddedInfo        = "The script %q is added to nexus\n"
+	scriptUpdatedInfo      = "The script %q is updated in nexus\n"
+	scriptDeletedInfo      = "The script %q is deleted from nexus\n"
+	scriptRunSuccessInfo   = "The script %q was executed successfully\n"
+	scriptRunNotFoundInfo  = "The script %q was not found in nexus. Make sure you add the script to nexus before executing the script\n"
+	scriptExistsInfo       = "The script %q already exists in nexus\n"
+	scriptNotfoundInfo     = "The script %q was not found in nexus\n"
 
 	//scripts
 	getPrivilegesScript   = "get-privileges"
