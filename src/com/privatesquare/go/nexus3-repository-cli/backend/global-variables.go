@@ -14,4 +14,6 @@ var (
 	SelectorTasks       = []string{"list", "create", "update", "delete"}
 	PrivilegeTasks      = []string{"list", "create", "update", "delete"}
 	PrivilegeActions    = []string{"all", "read", "write"}
+	RoleTasks           = []string{"list", "create", "update", "delete"}
+	UpdateActions       = []string{"add", "remove"}
 )

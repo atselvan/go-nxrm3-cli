@@ -22,4 +22,5 @@ type ScriptResult struct {
 	Attributes       Attributes        `json:"attributes"`
 	ContentSelectors []ContentSelector `json:"contentSelectors"`
 	Privileges       []Privilege       `json:"privileges"`
+	Roles            []Role            `json:"roles"`
 }

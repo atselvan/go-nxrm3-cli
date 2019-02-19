@@ -25,3 +25,13 @@ type PrivilegeProperties struct {
 	Repository      string `json:"repository"`
 	Actions         string `json:"actions"`
 }
+
+type Role struct {
+	RoleID      string   `json:"roleId"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Source      string   `json:"source"`
+	Roles       []string `json:"roles"`
+	Privileges  []string `json:"privileges"`
+	ReadOnly    bool     `json:"readOnly"`
+}

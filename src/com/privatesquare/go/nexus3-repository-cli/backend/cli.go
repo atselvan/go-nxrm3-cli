@@ -149,5 +149,19 @@ func PrintPrivilegeCommandUsage(fs *flag.FlagSet) {
 func PrintRoleCommandUsage(fs *flag.FlagSet) {
 	fs.Usage = func() {
 		fmt.Printf("Usage: nexus3-repository-cli role [args] [options]\n\n")
+		fmt.Printf("[args]\n\n  "+
+			"-%s string\t%s\n  -%s string\n\t%s\n  "+
+			"-%s string\n\t%s\n  -%s string\n\t%s\n  "+
+			"-%s string\n\t%s\n  -%s string\n\t%s\n"+
+			"\n[options]\n\n  -%s\n\t%s\n  -%s\n\t%s\n  -%s\n\t%s\n\n",
+			TaskFlag, RoleTaskUsage,
+			RoleIDFlag, RoleIDUsage,
+			RoleDescFlag, RoleDescUsage,
+			RoleMembersFlag, RoleMembersUsage,
+			RolePrivilegesFlag, RolePrivilegesUsage,
+			UpdateActionFlag, fmt.Sprintf(UpdateActionUsage, UpdateActions),
+			SkipTlsFlag, SkipTlsUsage,
+			DebugFlag, DebugUsage,
+			VerboseFlag, VerboseUsage)
 	}
 }

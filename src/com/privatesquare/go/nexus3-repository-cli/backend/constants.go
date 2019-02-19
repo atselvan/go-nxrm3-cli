@@ -8,6 +8,9 @@ const (
 	scriptAPI      = "v1/script"
 	repositoryPath = "v1/repositories"
 
+	successStatus  = "200 OK"
+	notFoundStatus = "404 Not Found"
+
 	// Script Path
 	scriptBasePath = "./scripts/groovy"
 
@@ -69,11 +72,15 @@ const (
 
 	scriptNameRequiredInfo = "name is a required parameter"
 
-	//script name
+	//scripts
 	getPrivilegesScript   = "get-privileges"
 	createPrivilegeScript = "create-privilege"
 	updatePrivilegeScript = "update-privilege"
 	deletePrivilegeScript = "delete-privilege"
+	getRoleScript         = "get-roles"
+	createRoleScript      = "create-role"
+	updateRoleScript      = "update-role"
+	deleteRoleScript      = "delete-role"
 
 	//repo
 	RepoTaskUsage = "Repo Task (Required)\n\n" +
@@ -145,7 +152,7 @@ const (
 	PrivilegeTaskUsage = "Privilege Task (Required)\n\n" +
 		"    list 	    List all the privileges in nexus (Optional: name)\n" +
 		"    create  	    Create a Privilege in nexus (Required: name, selector-name and repo-name) (Optional: description and action)\n" +
-		"    update 	    Update the details of a Privilege. (Required: name and expression)\n" +
+		"    update 	    Update the details of a Privilege. (Required: name)(Optional: selector-name, repo-name, description and action)\n" +
 		"    delete          Delete a Privilege (Required: name)\n"
 
 	PrivilegeNameFlag  = "name"
@@ -164,4 +171,43 @@ const (
 	createPrivilegeSuccessInfo  = "Privilege %q is created"
 	updatePrivilegeSuccessInfo  = "Privilege %q is updated"
 	deletePrivilegeSuccessInfo  = "Privilege %q is deleted"
+
+	//role
+	RoleTaskUsage = "Role Task (Required)\n\n" +
+		"    list 	    List all the roles in nexus (Optional: id)\n" +
+		"    create  	    Create a role in nexus (Required: id) (Optional: description, role-members, role-privileges)\n" +
+		"    update 	    Update the details of a role. (Required: id, action) (Optional: description, role-members, role-privileges)\n" +
+		"    delete          Delete a Privilege (Required: id)\n"
+
+	RoleIDFlag          = "id"
+	RoleIDUsage         = "Role ID"
+	RoleDescFlag        = "description"
+	RoleDescUsage       = "Role description"
+	RoleMembersFlag     = "role-members"
+	RoleMembersUsage    = "Comma separated role member id's to be added to a role"
+	RolePrivilegesFlag  = "role-privileges"
+	RolePrivilegesUsage = "Comma separated privileges to be added to a role"
+
+	UpdateActionFlag         = "action"
+	UpdateActionUsage        = "Update Action. Available values = %+q\n"
+	UpdateActionRequiredInfo = "Update action is a required parameter. Available values = %+q\n"
+	UpdateActionInvalidInfo  = "%s is not a valid update action. Available actions: %+q\n"
+
+	defaultRoleDescription        = "Custom role created from the CLI"
+	defaultRoleSource             = "Nexus"
+	roleIDRequiredInfo            = "id is a required parameter"
+	roleNotFoundInfo              = "Role %q was not found in nexus\n"
+	roleExistsInfo                = "Role %q already exists\n"
+	createRoleRequiredInfo        = "id, description and source are required parameters"
+	createRoleSuccessInfo         = "Role %q is created with role members %v and privileges %+q\n"
+	updateRoleSuccessInfo         = "Role %q is updated\n"
+	deleteRoleSuccessInfo         = "Role %q is deleted\n"
+	roleItemsRequiredInfo         = "%s : You need to provide at least one valid role member or role privilege during role creation\n"
+	noRoleMemberProvidedInfo      = "No role members are provided to add to the role"
+	noValidRoleMemberInfo         = "No valid role members are provided to add to the role"
+	cannotBeSameRoleInfo          = "Role member %q == role id %s, cannot add a role as a member in the same role"
+	roleMemberNotFoundInfo        = "Role %q was not found in nexus, hence it cannot be added to the role"
+	rolePrivilegeNotFoundInfo     = "Privilege %q was not found in nexus, hence it cannot be added to the role"
+	noValidRolePrivilegeInfo      = "No valid privileges are provided to add to the role"
+	noRolePrivilegesIProvidedInfo = "No privileges are provided to add to the role"
 )

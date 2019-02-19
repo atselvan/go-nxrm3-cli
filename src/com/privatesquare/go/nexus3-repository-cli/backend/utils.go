@@ -159,3 +159,21 @@ func getfuncName() string {
 func toLower(s string) string {
 	return strings.ToLower(s)
 }
+
+func getSliceIndex(slice []string, entry string) int {
+	for i := 0; i < len(slice); i++ {
+		if slice[i] == entry {
+			return i
+		}
+	}
+	return -1
+}
+
+func removeEntryFromSlice(slice []string, entry string) []string {
+	i := getSliceIndex(slice, entry)
+	if i == -1 {
+		log.Printf("The entry %s does not exist, hence it cannot be removed", entry)
+		os.Exit(1)
+	}
+	return append(slice[:i], slice[i+1:]...)
+}

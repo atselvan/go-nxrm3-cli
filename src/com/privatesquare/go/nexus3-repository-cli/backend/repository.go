@@ -54,6 +54,7 @@ func CreateHosted(repoName, blobStoreName, format string, dockerHttpPort, docker
 
 	repository := m.Repository{Name: repoName, Format: format, Recipe: recipe, Attributes: attributes}
 	payload, err := json.Marshal(repository)
+	fmt.Println(string(payload))
 	logJsonMarshalError(err, getfuncName())
 	result := RunScript("create-hosted-repo", string(payload))
 	printCreateRepoStatus(repoName, result.Status)

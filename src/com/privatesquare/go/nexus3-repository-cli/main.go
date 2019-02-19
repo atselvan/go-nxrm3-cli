@@ -53,7 +53,7 @@ func main() {
 	csSkipTLS := selectorCommand.Bool(b.SkipTlsFlag, false, b.SkipTlsUsage)
 	csDebug := selectorCommand.Bool(b.DebugFlag, false, b.DebugUsage)
 	csVerbose := selectorCommand.Bool(b.VerboseFlag, false, b.VerboseUsage)
-	//privilegeFlags
+	//privilege flags
 	privilegeTask := privilegeCommand.String(b.TaskFlag, "", b.PrivilegeTaskUsage)
 	privilegeName := privilegeCommand.String(b.PrivilegeNameFlag, "", b.PrivilegeNameUsage)
 	pSelectorName := privilegeCommand.String(b.PSelectorNameFlag, "", b.SelectorNameUsage)
@@ -63,6 +63,17 @@ func main() {
 	pSkipTLS := privilegeCommand.Bool(b.SkipTlsFlag, false, b.SkipTlsUsage)
 	pDebug := privilegeCommand.Bool(b.DebugFlag, false, b.DebugUsage)
 	pVerbose := privilegeCommand.Bool(b.VerboseFlag, false, b.VerboseUsage)
+	//role flags
+	roleTask := roleCommand.String(b.TaskFlag, "", b.RoleTaskUsage)
+	roleID := roleCommand.String(b.RoleIDFlag, "", b.RoleIDUsage)
+	roleDesc := roleCommand.String(b.RoleDescFlag, "", b.RoleDescUsage)
+	roleMembers := roleCommand.String(b.RoleMembersFlag, "", b.RoleMembersUsage)
+	rolePrivileges := roleCommand.String(b.RolePrivilegesFlag, "", b.RolePrivilegesUsage)
+	updateAction := roleCommand.String(b.UpdateActionFlag, "", b.UpdateActionUsage)
+
+	rSkipTLS := roleCommand.Bool(b.SkipTlsFlag, false, b.SkipTlsUsage)
+	rDebug := roleCommand.Bool(b.DebugFlag, false, b.DebugUsage)
+	rVerbose := roleCommand.Bool(b.VerboseFlag, false, b.VerboseUsage)
 
 	b.Usage()
 	flag.Parse()
@@ -239,8 +250,37 @@ func main() {
 		case "delete":
 			b.DeletePrivilege(*privilegeName)
 		default:
-			selectorCommand.Usage()
+			privilegeCommand.Usage()
 			log.Printf(b.TaskNotValidInfo, *privilegeTask, "privilege", b.PrivilegeTasks)
+			os.Exit(1)
+		}
+	}
+
+	if roleCommand.Parsed() {
+		// Required flags
+		if *roleTask == "" {
+			roleCommand.Usage()
+			log.Printf(b.TaskEmptyInfo, b.RoleTasks)
+			os.Exit(1)
+		}
+		// set global variables
+		b.SetConnectionDetails()
+		b.SkipTLSVerification = *rSkipTLS
+		b.Debug = *rDebug
+		b.Verbose = *rVerbose
+		// run tasks
+		switch *roleTask {
+		case "list":
+			b.ListRoles(*roleID)
+		case "create":
+			b.CreateRole(*roleID, *roleDesc, *roleMembers, *rolePrivileges)
+		case "update":
+			b.UpdateRole(*roleID, *roleDesc, *roleMembers, *rolePrivileges, *updateAction)
+		case "delete":
+			b.DeleteRole(*roleID)
+		default:
+			roleCommand.Usage()
+			log.Printf(b.TaskNotValidInfo, *roleTask, "role", b.RoleTasks)
 			os.Exit(1)
 		}
 	}
