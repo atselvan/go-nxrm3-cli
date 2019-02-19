@@ -5,30 +5,30 @@ repoFormat=("maven" "npm" "nuget" "bower" "pypi" "raw" "rubygems" "yum")
 
 cleanUpInitialRepositories() {
     # Initial repo cleanup
-    $1 repo -skip-tls -task delete -repo-name maven-central
-    $1 repo -skip-tls -task delete -repo-name maven-public
-    $1 repo -skip-tls -task delete -repo-name maven-releases
-    $1 repo -skip-tls -task delete -repo-name maven-snapshots
-    $1 repo -skip-tls -task delete -repo-name nuget-group
-    $1 repo -skip-tls -task delete -repo-name nuget-hosted
-    $1 repo -skip-tls -task delete -repo-name nuget.org-proxy
+    $1 repo -skip-tls -task delete -name maven-central
+    $1 repo -skip-tls -task delete -name maven-public
+    $1 repo -skip-tls -task delete -name maven-releases
+    $1 repo -skip-tls -task delete -name maven-snapshots
+    $1 repo -skip-tls -task delete -name nuget-group
+    $1 repo -skip-tls -task delete -name nuget-hosted
+    $1 repo -skip-tls -task delete -name nuget.org-proxy
 }
 
 cleanUpRepoStructure(){
-    $1 repo -skip-tls -task delete -repo-name $2-snapshots
-    $1 repo -skip-tls -task delete -repo-name $2-releases
-    $1 repo -skip-tls -task delete -repo-name $2-proxy
-    $1 repo -skip-tls -task delete -repo-name $2-proxy-withCred
-    $1 repo -skip-tls -task delete -repo-name $2-group
+    $1 repo -skip-tls -task delete -name $2-snapshots
+    $1 repo -skip-tls -task delete -name $2-releases
+    $1 repo -skip-tls -task delete -name $2-proxy
+    $1 repo -skip-tls -task delete -name $2-proxy-withCred
+    $1 repo -skip-tls -task delete -name $2-group
 }
 
 cleanupDockerRepoStructure(){
-    $1 repo -skip-tls -task delete -repo-name docker-both
-    $1 repo -skip-tls -task delete -repo-name docker-http
-    $1 repo -skip-tls -task delete -repo-name docker-https
-    $1 repo -skip-tls -task delete -repo-name docker-proxy
-    $1 repo -skip-tls -task delete -repo-name docker-proxy-withCred
-    $1 repo -skip-tls -task delete -repo-name docker-group
+    $1 repo -skip-tls -task delete -name docker-both
+    $1 repo -skip-tls -task delete -name docker-http
+    $1 repo -skip-tls -task delete -name docker-https
+    $1 repo -skip-tls -task delete -name docker-proxy
+    $1 repo -skip-tls -task delete -name docker-proxy-withCred
+    $1 repo -skip-tls -task delete -name docker-group
 }
 
 cleanUpRoles(){

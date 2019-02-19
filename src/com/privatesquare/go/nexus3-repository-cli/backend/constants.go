@@ -11,6 +11,7 @@ const (
 	successStatus   = "200 OK"
 	notFoundStatus  = "404 Not Found"
 	noContentStatus = "204 No Content"
+	foundStatus = "302 Found"
 
 	// Script Path
 	scriptBasePath = "./scripts/groovy"
@@ -81,6 +82,12 @@ const (
 	scriptNotfoundInfo     = "The script %q was not found in nexus\n"
 
 	//scripts
+	getRepoScript = "get-repo"
+	createHostedRepoScript = "create-hosted-repo"
+	createProxyRepoScript = "create-proxy-repo"
+	createGroupRepoScript = "create-group-repo"
+	addGroupMembersScript = "add-group-members"
+	deleteRepoScript = "delete-repo"
 	getPrivilegesScript   = "get-privileges"
 	createPrivilegeScript = "create-privilege"
 	updatePrivilegeScript = "update-privilege"
@@ -93,22 +100,22 @@ const (
 	//repo
 	RepoTaskUsage = "Repo Task (Required)\n\n" +
 		"    list   		List all the repositories in nexus.\n" +
-		"			(Optional - repo-name) If repo-name is passed the list command will get the details of the repository.\n" +
-		"			(Optional - repo-format) If repo-format is passed the list command will list the repositories as per the format\n" +
-		"    create-hosted	Create a hosted repository in nexus. (Required - repo-name and repo-format)\n" +
-		"    create-proxy	Create a proxy repository in nexus. (Required - repo-name, repo-format and remote-url ) (Optional - proxy-user and proxy-pass)\n" +
-		"    create-group	Create a group repository in nexus. (Required - repo-name,repo-format and repo-members)\n" +
-		"    add-group-members	Add new members to a existing group repository. (Required - repo-name,repo-format and repo-members)\n" +
-		"    delete		Delete a repository from nexus\n\n" +
+		"			(Optional: name) If repo-name is passed the list command will get the details of the repository.\n" +
+		"			(Optional: format) If repo-format is passed the list command will list the repositories as per the format\n" +
+		"    create-hosted	Create a hosted repository in nexus. (Required: name and format)\n" +
+		"    create-proxy	Create a proxy repository in nexus. (Required: name, repo-format and remote-url ) (Optional: proxy-user and proxy-pass)\n" +
+		"    create-group	Create a group repository in nexus. (Required: name,repo-format and repo-members)\n" +
+		"    add-group-members	Add new members to a existing group repository. (Required: name, format and members)\n" +
+		"    delete		Delete a repository from nexus (Required: name)\n\n" +
 		"    If you are creating a docker repository it is necessary to also provide either a docker-http-port or a docker-https-port or both.\n"
 
-	RepoNameFlag         = "repo-name"
+	RepoNameFlag         = "name"
 	RepoNameUsage        = "Nexus repository name"
-	RepoFormatFlag       = "repo-format"
+	RepoFormatFlag       = "format"
 	RepoFormatUsage      = "Repository format. Available formats : %+q"
 	RemoteURLFlag        = "remote-url"
 	RemoteURLUsage       = "Remote URL to be proxied in nexus"
-	RepoMembersFlag      = "repo-members"
+	RepoMembersFlag      = "members"
 	RepoMembersUsage     = "Comma-separated repository names that should be added to a group repo"
 	ProxyUserFlag        = "proxy-user"
 	ProxyUserUsage       = "Username for accessing the proxy repository"
@@ -131,6 +138,20 @@ const (
 	groupRequiredInfo      = "repo-name, repo-format and repo-members are required parameters"
 	dockerPortsInfo        = "You need to specify either a http port or a https port or both for creating a docker repository"
 	repositoryNotFoundInfo = "Repository %q was not found in nexus"
+	repoCreatedInfo = "Repository %q was created in nexus\n"
+	repoUpdatedStatus = "Repository %q was updated in nexus\n"
+	repoDeletedInfo = "Repository %q was deleted from nexus\n"
+	repoCreateErrorInfo = "Error creating repository : %s\n"
+	repoUpdateErrorInfo = "Error updating repository : %s\n"
+	repoDeleteErrorInfo = "Error deleting repository : %s\n"
+	repoExistsInfo = "Repository %q already exists in nexus\n"
+	groupMemberAlreadyExistsInfo = "Member %q already exists in the group %q, hence not adding the member again\n"
+	cannotBeSameRepoInfo = "Member %q == group %q, cannot add a group repository as a member in the same group\n"
+	proxyCredsNotValidInfo = "You need to provide both proxy-user and proxy-pass to set credentials to a proxy repository"
+	remoteURLNotValidInfo = "%q is an invalid url. URL must begin with either http:// or https://"
+	groupMemberInvalidFormatInfo = "Repository %q is not a %q format repository, hence it cannot be added to the group repository\n"
+	groupMemberNotFoundInfo = "Repository %q was not found in Nexus, hence it cannot be added to the group repository\n"
+	groupMemberRequiredInfo = "At least one valid group member should be provided to add to a group repository"
 
 	//selector
 	contentSelectorType = "csel"

@@ -10,25 +10,25 @@ import (
 	"strings"
 )
 
-func ListRepositories(repoName, repoFormat string) {
+func ListRepositories(name, format string) {
 	var repositoryList []string
 
-	if repoName != "" {
-		repository := getRepository(repoName)
+	if name != "" {
+		repository := getRepository(name)
 		fmt.Printf("Name: %s\nRecipe: %s\nURL: %s\n", repository.Name, repository.Recipe, repository.URL)
-	} else if repoName == "" && repoFormat == "" {
+	} else if name == "" && format == "" {
 		repositoryList = getRepositoryList()
 	} else {
-		repositoryList = getRepositoryListByFormat(validateRepositoryFormat(repoFormat))
+		repositoryList = getRepositoryListByFormat(validateRepositoryFormat(name))
 	}
-	if repoName == "" {
+	if name == "" {
 		printStringSlice(repositoryList)
 		fmt.Printf("Number of repositories : %d\n", len(repositoryList))
 	}
 }
 
-func CreateHosted(repoName, blobStoreName, format string, dockerHttpPort, dockerHttpsPort int, releases bool) {
-	if repoName == "" || format == "" {
+func CreateHosted(name, blobStoreName, format string, dockerHttpPort, dockerHttpsPort int, releases bool) {
+	if name == "" || format == "" {
 		log.Printf("%s : %s", getfuncName(), hostedRepoRequiredInfo)
 		os.Exit(1)
 	}
@@ -52,16 +52,15 @@ func CreateHosted(repoName, blobStoreName, format string, dockerHttpPort, docker
 		attributes = m.Attributes{Storage: storage}
 	}
 
-	repository := m.Repository{Name: repoName, Format: format, Recipe: recipe, Attributes: attributes}
+	repository := m.Repository{Name: name, Format: format, Recipe: recipe, Attributes: attributes}
 	payload, err := json.Marshal(repository)
-	fmt.Println(string(payload))
 	logJsonMarshalError(err, getfuncName())
-	result := RunScript("create-hosted-repo", string(payload))
-	printCreateRepoStatus(repoName, result.Status)
+	result := RunScript(createHostedRepoScript, string(payload))
+	printCreateRepoStatus(name, result.Status)
 }
 
-func CreateProxy(repoName, blobStoreName, format, remoteURL, proxyUsername, proxyPassword string, dockerHttpPort, dockerHttpsPort int, releases bool) {
-	if repoName == "" || remoteURL == "" || format == "" {
+func CreateProxy(name, blobStoreName, format, remoteURL, proxyUsername, proxyPassword string, dockerHttpPort, dockerHttpsPort int, releases bool) {
+	if name == "" || remoteURL == "" || format == "" {
 		log.Printf("%s : %s", getfuncName(), proxyRepoRequiredInfo)
 		os.Exit(1)
 	}
@@ -93,15 +92,15 @@ func CreateProxy(repoName, blobStoreName, format, remoteURL, proxyUsername, prox
 		attributes = m.Attributes{Storage: storage, Proxy: proxy, Httpclient: proxyHttpClient, NegativeCache: negetiveCache}
 	}
 
-	repository := m.Repository{Name: repoName, Format: format, Recipe: recipe, Attributes: attributes}
+	repository := m.Repository{Name: name, Format: format, Recipe: recipe, Attributes: attributes}
 	payload, err := json.Marshal(repository)
 	logJsonMarshalError(err, getfuncName())
-	result := RunScript("create-proxy-repo", string(payload))
-	printCreateRepoStatus(repoName, result.Status)
+	result := RunScript(createProxyRepoScript, string(payload))
+	printCreateRepoStatus(name, result.Status)
 }
 
-func CreateGroup(repoName, blobStoreName, format, repoMembers string, dockerHttpPort, dockerHttpsPort int, releases bool) {
-	if repoName == "" || repoMembers == "" || format == "" {
+func CreateGroup(name, blobStoreName, format, repoMembers string, dockerHttpPort, dockerHttpsPort int, releases bool) {
+	if name == "" || repoMembers == "" || format == "" {
 		log.Printf("%s : %s", getfuncName(), groupRequiredInfo)
 		os.Exit(1)
 	}
@@ -128,66 +127,66 @@ func CreateGroup(repoName, blobStoreName, format, repoMembers string, dockerHttp
 		attributes = m.Attributes{Storage: storage, Group: group}
 	}
 
-	repository := m.Repository{Name: repoName, Format: format, Recipe: recipe, Attributes: attributes}
+	repository := m.Repository{Name: name, Format: format, Recipe: recipe, Attributes: attributes}
 	payload, err := json.Marshal(repository)
 	logJsonMarshalError(err, getfuncName())
-	result := RunScript("create-group-repo", string(payload))
-	printCreateRepoStatus(repoName, result.Status)
+	result := RunScript(createGroupRepoScript, string(payload))
+	printCreateRepoStatus(name, result.Status)
 }
 
-func AddMembersToGroup(repoName, format, repoMembers string) {
-	if repoName == "" || repoMembers == "" || format == "" {
+func AddMembersToGroup(name, format, repoMembers string) {
+	if name == "" || repoMembers == "" || format == "" {
 		log.Printf("%s : %s", getfuncName(), groupRequiredInfo)
 		os.Exit(1)
 	}
 	format = validateRepositoryFormat(format)
 	validList := validateGroupMembers(repoMembers, format)
-	if repositoryExists(repoName) {
-		repo := getRepository(repoName)
+	if repositoryExists(name) {
+		repo := getRepository(name)
 		currentMembers := repo.Attributes.Group.MemberNames
 		for _, newMember := range validList {
 			if entryExists(currentMembers, newMember) {
-				log.Printf("Member %q already exists in the group %q, hence not adding the member again\n", newMember, repoName)
-			} else if newMember == repoName {
-				log.Printf("Member %q == group %q, cannot add a group repository as a member in the same group\n", newMember, repoName)
+				log.Printf(groupMemberAlreadyExistsInfo, newMember, name)
+			} else if newMember == name {
+				log.Printf(cannotBeSameRepoInfo, newMember, name)
 			} else {
-				log.Printf("Member %q is added to the group %q\n", newMember, repoName)
+				log.Printf("Member %q is added to the group %q\n", newMember, name)
 				currentMembers = append(currentMembers, newMember)
 			}
 		}
 		repo.Attributes.Group = m.Group{MemberNames: currentMembers}
-		repository := m.Repository{Name: repoName, Format: format, Attributes: repo.Attributes}
+		repository := m.Repository{Name: name, Format: format, Attributes: repo.Attributes}
 		payload, err := json.Marshal(repository)
 		logJsonMarshalError(err, getfuncName())
-		result := RunScript("add-group-members", string(payload))
-		printUpdateRepoStatus(repoName, result.Status)
+		result := RunScript(addGroupMembersScript, string(payload))
+		printUpdateRepoStatus(name, result.Status)
 	} else {
-		log.Printf("Repository %q was not found\n", repoName)
+		log.Printf(repositoryNotFoundInfo, name)
 	}
 }
 
 // TODO: Add a function to remove members from group
 
-func DeleteRepository(repoName string) {
-	if repoName == "" {
+func DeleteRepository(name string) {
+	if name == "" {
 		log.Printf("%s : %s", getfuncName(), repoNameRequiredInfo)
 		os.Exit(1)
 	}
-	payload, err := json.Marshal(m.Repository{Name: repoName})
+	payload, err := json.Marshal(m.Repository{Name: name})
 	logJsonMarshalError(err, getfuncName())
-	result := RunScript("delete-repo", string(payload))
-	printDeleteRepoStatus(repoName, result.Status)
+	result := RunScript(deleteRepoScript, string(payload))
+	printDeleteRepoStatus(name, result.Status)
 }
 
-func getRepository(repoName string) m.Repository {
-	if repoName == "" {
+func getRepository(name string) m.Repository {
+	if name == "" {
 		log.Printf("%s : %s", getfuncName(), repoNameRequiredInfo)
 		os.Exit(1)
 	}
-	payload, err := json.Marshal(m.Repository{Name: repoName})
+	payload, err := json.Marshal(m.Repository{Name: name})
 	logJsonMarshalError(err, getfuncName())
-	result := RunScript("get-repo", string(payload))
-	if result.Status != "200 OK" {
+	result := RunScript(getRepoScript, string(payload))
+	if result.Status != successStatus {
 		log.Printf("%s : %s", getfuncName(), setVerboseInfo)
 		os.Exit(1)
 	}
@@ -199,12 +198,12 @@ func getRepositories() []m.Repository {
 	var repositories []m.Repository
 	req := createBaseRequest("GET", url, m.RequestBody{})
 	respBody, status := httpRequest(req)
-	if status != "200 OK" {
+	if status != successStatus {
 		log.Printf("%s : %s", getfuncName(), setVerboseInfo)
 		os.Exit(1)
 	} else {
 		err := json.Unmarshal(respBody, &repositories)
-		logError(err, "Get Repositories : JSON Unmarshal Error")
+		logJsonUnmarshalError(err, getfuncName())
 	}
 	return repositories
 }
@@ -218,29 +217,29 @@ func getRepositoryList() []string {
 	return repositoryList
 }
 
-func getRepositoryListByFormat(repoFormat string) []string {
+func getRepositoryListByFormat(format string) []string {
 	var repositoryList []string
 	repositories := getRepositories()
 	for _, r := range repositories {
-		if repoFormat == r.Format {
+		if format == r.Format {
 			repositoryList = append(repositoryList, r.Name)
 		}
 	}
 	return repositoryList
 }
 
-func repositoryExists(repoName string) bool {
-	if repoName == "" {
+func repositoryExists(name string) bool {
+	if name == "" {
 		log.Printf("%s : %s", getfuncName(), repoNameRequiredInfo)
 		os.Exit(1)
 	}
 	var isExists bool
-	payload, err := json.Marshal(m.Repository{Name: repoName})
+	payload, err := json.Marshal(m.Repository{Name: name})
 	logJsonMarshalError(err, getfuncName())
-	result := RunScript("get-repo", string(payload))
-	if result.Status == "200 OK" {
+	result := RunScript(getRepoScript, string(payload))
+	if result.Status == successStatus {
 		isExists = true
-	} else if result.Status == "404 Not Found" {
+	} else if result.Status == notFoundStatus {
 		isExists = false
 	} else {
 		log.Printf("%s : %s", getfuncName(), setVerboseInfo)
@@ -286,7 +285,7 @@ func validateRepositoryFormat(format string) string {
 		formatChoice[repoFormat] = true
 	}
 	if _, validChoice := formatChoice[format]; !validChoice {
-		log.Printf("%s : %q is not a valid repository format. Available repository formats are : %v\n", getfuncName(), format, RepoFormats)
+		log.Printf("%s : %s", getfuncName(), fmt.Sprintf(RepoFormatNotValidInfo, format, RepoFormats))
 		os.Exit(1)
 	}
 	if format == "maven" {
@@ -301,7 +300,7 @@ func validateProxyAuthInfo(proxyUsername, proxyPassword string) {
 	} else if proxyUsername != "" && proxyPassword != "" {
 		return
 	} else {
-		log.Printf("%s : You need to provide both proxy-user and proxy-pass to set credentials to a proxy repository\n", getfuncName())
+		log.Printf("%s : %s\n", getfuncName(), proxyCredsNotValidInfo)
 		os.Exit(1)
 	}
 }
@@ -312,7 +311,7 @@ func validateRemoteURL(url string) {
 	if httpRegex.MatchString(url) || httpsRegex.MatchString(url) {
 		return
 	} else {
-		log.Printf("%s : %q is an invalid url. URL must begin with either http:// or https://\n", getfuncName(), url)
+		log.Printf("%s : %s", getfuncName(), fmt.Sprintf(remoteURLNotValidInfo, url))
 		os.Exit(1)
 	}
 }
@@ -326,45 +325,45 @@ func validateGroupMembers(repoMembers, format string) []string {
 			if strings.Contains(repoDetails.Recipe, format) {
 				validList = append(validList, repoMember)
 			} else {
-				log.Printf("Repository %q is not a %q format repository, hence it cannot be added to the group repository\n", repoMember, format)
+				log.Printf(groupMemberInvalidFormatInfo, repoMember, format)
 			}
 		} else {
-			log.Printf("Repository %q was not found, hence it cannot be added to the group repository\n", repoMember)
+			log.Printf(groupMemberNotFoundInfo, repoMember)
 		}
 	}
 	if len(validList) < 1 {
-		log.Printf("%s : Atleast one valid group member should be provided to add to a group repository", getfuncName())
+		log.Printf("%s : %s\n", getfuncName(), groupMemberRequiredInfo)
 		os.Exit(1)
 	}
 	return validList
 }
 
-func printCreateRepoStatus(repoName, status string) {
-	if status == "200 OK" {
-		log.Printf("Repository %q was created in nexus\n", repoName)
-	} else if status == "302 Found" {
-		log.Printf("Repository %q already exists in nexus\n", repoName)
+func printCreateRepoStatus(name, status string) {
+	if status == successStatus {
+		log.Printf( repoCreatedInfo, name)
+	} else if status == foundStatus {
+		log.Printf(repoExistsInfo, name)
 	} else {
-		log.Printf("Error creating repository : %s\n", setVerboseInfo)
+		log.Printf(repoCreateErrorInfo, setVerboseInfo)
 	}
 }
 
-func printUpdateRepoStatus(repoName, status string) {
-	if status == "200 OK" {
-		log.Printf("Repository %q was updated in nexus\n", repoName)
-	} else if status == "404 Not Found" {
-		log.Printf("Repository %q was not found in nexus\n", repoName)
+func printUpdateRepoStatus(name, status string) {
+	if status == successStatus {
+		log.Printf(repoUpdatedStatus, name)
+	} else if status == notFoundStatus {
+		log.Printf(repositoryNotFoundInfo, name)
 	} else {
-		log.Printf("Error updating repository : %s\n", setVerboseInfo)
+		log.Printf(repoUpdateErrorInfo, setVerboseInfo)
 	}
 }
 
-func printDeleteRepoStatus(repoName, status string) {
-	if status == "200 OK" {
-		log.Printf("Repository %q was deleted from nexus\n", repoName)
-	} else if status == "404 Not Found" {
-		log.Printf("Repository %q was not found in nexus\n", repoName)
+func printDeleteRepoStatus(name, status string) {
+	if status == successStatus {
+		log.Printf(repoDeletedInfo, name)
+	} else if status == notFoundStatus {
+		log.Printf(repositoryNotFoundInfo, name)
 	} else {
-		log.Printf("Error deleting repository : %s\n", setVerboseInfo)
+		log.Printf(repoDeleteErrorInfo, setVerboseInfo)
 	}
 }
