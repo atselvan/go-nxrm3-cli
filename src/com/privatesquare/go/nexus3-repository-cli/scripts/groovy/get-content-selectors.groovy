@@ -18,8 +18,4 @@ selectorManager.browse().each{ cs ->
 output.put("status", "200 OK")
 output.put("contentSelectors", contentSlectorList)
 
-log.info("***********************************************")
-log.info(String.format("Testing security classes"))
-log.info("***********************************************")
-
 return JsonOutput.toJson(output)
