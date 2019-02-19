@@ -139,10 +139,11 @@ func AddMembersToGroup(name, format, repoMembers string) {
 		log.Printf("%s : %s", getfuncName(), groupRequiredInfo)
 		os.Exit(1)
 	}
-	format = validateRepositoryFormat(format)
-	validList := validateGroupMembers(repoMembers, format)
 	if repositoryExists(name) {
 		repo := getRepository(name)
+		validateGroupRepo(repo)
+		format = validateRepositoryFormat(format)
+		validList := validateGroupMembers(repoMembers, format)
 		currentMembers := repo.Attributes.Group.MemberNames
 		for _, newMember := range validList {
 			if entryExists(currentMembers, newMember) {
@@ -150,7 +151,7 @@ func AddMembersToGroup(name, format, repoMembers string) {
 			} else if newMember == name {
 				log.Printf(cannotBeSameRepoInfo, newMember, name)
 			} else {
-				log.Printf("Member %q is added to the group %q\n", newMember, name)
+				log.Printf(groupMemberAddSuccessInfo, newMember, name)
 				currentMembers = append(currentMembers, newMember)
 			}
 		}
@@ -158,14 +159,44 @@ func AddMembersToGroup(name, format, repoMembers string) {
 		repository := m.Repository{Name: name, Format: format, Attributes: repo.Attributes}
 		payload, err := json.Marshal(repository)
 		logJsonMarshalError(err, getfuncName())
-		result := RunScript(addGroupMembersScript, string(payload))
+		result := RunScript(updateGroupMembersScript, string(payload))
 		printUpdateRepoStatus(name, result.Status)
 	} else {
 		log.Printf(repositoryNotFoundInfo, name)
 	}
 }
 
-// TODO: Add a function to remove members from group
+func RemoveMembersFromGroup(name, format, repoMembers string) {
+	if name == "" || repoMembers == "" || format == "" {
+		log.Printf("%s : %s", getfuncName(), groupRequiredInfo)
+		os.Exit(1)
+	}
+	if repositoryExists(name) {
+		repo := getRepository(name)
+		validateGroupRepo(repo)
+		format = validateRepositoryFormat(format)
+		validList := validateGroupMembers(repoMembers, format)
+		currentMembers := repo.Attributes.Group.MemberNames
+		for _, newMember := range validList {
+			if !entryExists(currentMembers, newMember) {
+				log.Printf(groupMemberRemoveNotFoundInfo, newMember, name)
+			} else if newMember == name {
+				log.Printf(cannotBeSameRepoInfo, newMember, name)
+			} else {
+				log.Printf(groupMemberRemoveSuccessInfo, newMember, name)
+				currentMembers = removeEntryFromSlice(currentMembers, newMember)
+			}
+		}
+		repo.Attributes.Group = m.Group{MemberNames: currentMembers}
+		repository := m.Repository{Name: name, Format: format, Attributes: repo.Attributes}
+		payload, err := json.Marshal(repository)
+		logJsonMarshalError(err, getfuncName())
+		result := RunScript(updateGroupMembersScript, string(payload))
+		printUpdateRepoStatus(name, result.Status)
+	} else {
+		log.Printf(repositoryNotFoundInfo, name)
+	}
+}
 
 func DeleteRepository(name string) {
 	if name == "" {
@@ -312,6 +343,15 @@ func validateRemoteURL(url string) {
 		return
 	} else {
 		log.Printf("%s : %s", getfuncName(), fmt.Sprintf(remoteURLNotValidInfo, url))
+		os.Exit(1)
+	}
+}
+
+func validateGroupRepo(repo m.Repository){
+	if strings.Contains(repo.Recipe, "group"){
+		return
+	}else {
+		log.Printf(notAGroupRepoInfo, repo.Name)
 		os.Exit(1)
 	}
 }

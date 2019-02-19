@@ -86,7 +86,7 @@ const (
 	createHostedRepoScript = "create-hosted-repo"
 	createProxyRepoScript = "create-proxy-repo"
 	createGroupRepoScript = "create-group-repo"
-	addGroupMembersScript = "add-group-members"
+	updateGroupMembersScript = "update-group-members"
 	deleteRepoScript = "delete-repo"
 	getPrivilegesScript   = "get-privileges"
 	createPrivilegeScript = "create-privilege"
@@ -94,19 +94,19 @@ const (
 	deletePrivilegeScript = "delete-privilege"
 	getRoleScript         = "get-roles"
 	createRoleScript      = "create-role"
-	updateRoleScript      = "update-role"
 	deleteRoleScript      = "delete-role"
 
 	//repo
 	RepoTaskUsage = "Repo Task (Required)\n\n" +
-		"    list   		List all the repositories in nexus.\n" +
-		"			(Optional: name) If repo-name is passed the list command will get the details of the repository.\n" +
-		"			(Optional: format) If repo-format is passed the list command will list the repositories as per the format\n" +
-		"    create-hosted	Create a hosted repository in nexus. (Required: name and format)\n" +
-		"    create-proxy	Create a proxy repository in nexus. (Required: name, repo-format and remote-url ) (Optional: proxy-user and proxy-pass)\n" +
-		"    create-group	Create a group repository in nexus. (Required: name,repo-format and repo-members)\n" +
-		"    add-group-members	Add new members to a existing group repository. (Required: name, format and members)\n" +
-		"    delete		Delete a repository from nexus (Required: name)\n\n" +
+		"    list   		  List all the repositories in nexus.\n" +
+		"			  (Optional: name) If repo-name is passed the list command will get the details of the repository.\n" +
+		"			  (Optional: format) If repo-format is passed the list command will list the repositories as per the format\n" +
+		"    create-hosted	  Create a hosted repository in nexus. (Required: name and format)\n" +
+		"    create-proxy	  Create a proxy repository in nexus. (Required: name, repo-format and remote-url ) (Optional: proxy-user and proxy-pass)\n" +
+		"    create-group	  Create a group repository in nexus. (Required: name,repo-format and repo-members)\n" +
+		"    add-group-members	  Add new members to an existing group repository. Comma-separated values (Required: name, format and members)\n" +
+		"    remove-group-members  Remove members from an existing group repository. Comma-separated values (Required: name, format and members)\n" +
+		"    delete		  Delete a repository from nexus (Required: name)\n\n" +
 		"    If you are creating a docker repository it is necessary to also provide either a docker-http-port or a docker-https-port or both.\n"
 
 	RepoNameFlag         = "name"
@@ -131,11 +131,11 @@ const (
 	ReleaseUsage         = "Set this flag to create a releases repository"
 
 	RepoFormatNotValidInfo = "%q is not a valid repository format. Available repository formats are : %v\n"
-	repoNameRequiredInfo   = "repo-name is a required parameter"
-	repoFormatRequiredInfo = "repo-format is a required parameter"
-	hostedRepoRequiredInfo = "repo-name and repo-format are required parameters to create a hosted repository"
-	proxyRepoRequiredInfo  = "repo-name, repo-format and remote-url are required parameters to create a proxy repository"
-	groupRequiredInfo      = "repo-name, repo-format and repo-members are required parameters"
+	repoNameRequiredInfo   = "name is a required parameter"
+	repoFormatRequiredInfo = "format is a required parameter"
+	hostedRepoRequiredInfo = "name and format are required parameters to create a hosted repository"
+	proxyRepoRequiredInfo  = "name, format and remote-url are required parameters to create a proxy repository"
+	groupRequiredInfo      = "name, format and members are required parameters"
 	dockerPortsInfo        = "You need to specify either a http port or a https port or both for creating a docker repository"
 	repositoryNotFoundInfo = "Repository %q was not found in nexus"
 	repoCreatedInfo = "Repository %q was created in nexus\n"
@@ -145,13 +145,17 @@ const (
 	repoUpdateErrorInfo = "Error updating repository : %s\n"
 	repoDeleteErrorInfo = "Error deleting repository : %s\n"
 	repoExistsInfo = "Repository %q already exists in nexus\n"
-	groupMemberAlreadyExistsInfo = "Member %q already exists in the group %q, hence not adding the member again\n"
 	cannotBeSameRepoInfo = "Member %q == group %q, cannot add a group repository as a member in the same group\n"
 	proxyCredsNotValidInfo = "You need to provide both proxy-user and proxy-pass to set credentials to a proxy repository"
 	remoteURLNotValidInfo = "%q is an invalid url. URL must begin with either http:// or https://"
+	notAGroupRepoInfo = "%q is not a group repository\n"
 	groupMemberInvalidFormatInfo = "Repository %q is not a %q format repository, hence it cannot be added to the group repository\n"
+	groupMemberAlreadyExistsInfo = "Member %q already exists in the group %q, hence not adding the member again\n"
 	groupMemberNotFoundInfo = "Repository %q was not found in Nexus, hence it cannot be added to the group repository\n"
+	groupMemberRemoveNotFoundInfo = "Member %q was not found in the group %q, hence cannot remove the member from the group\n"
 	groupMemberRequiredInfo = "At least one valid group member should be provided to add to a group repository"
+	groupMemberAddSuccessInfo = "Member %q is added to the group %q\n"
+	groupMemberRemoveSuccessInfo = "Member %q is removed from the group %q\n"
 
 	//selector
 	contentSelectorType = "csel"

@@ -189,6 +189,8 @@ func main() {
 			b.CreateGroup(*repoName, *blobStoreName, *repoFormat, *repoMembers, *dockerHttpPort, *dockerHttpsPort, *releases)
 		case "add-group-members":
 			b.AddMembersToGroup(*repoName, *repoFormat, *repoMembers)
+		case "remove-group-members":
+			b.RemoveMembersFromGroup(*repoName, *repoFormat, *repoMembers)
 		case "delete":
 			b.DeleteRepository(*repoName)
 		default:
