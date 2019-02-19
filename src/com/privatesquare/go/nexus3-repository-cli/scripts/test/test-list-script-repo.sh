@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CLI="../nexus3-repository-cli"
+CLI="./nexus3-repository-cli"
 
 printf "****************************************************************************************************\n"
 $CLI script -skip-tls -task list
