@@ -347,10 +347,10 @@ func validateRemoteURL(url string) {
 	}
 }
 
-func validateGroupRepo(repo m.Repository){
-	if strings.Contains(repo.Recipe, "group"){
+func validateGroupRepo(repo m.Repository) {
+	if strings.Contains(repo.Recipe, "group") {
 		return
-	}else {
+	} else {
 		log.Printf(notAGroupRepoInfo, repo.Name)
 		os.Exit(1)
 	}
@@ -380,7 +380,7 @@ func validateGroupMembers(repoMembers, format string) []string {
 
 func printCreateRepoStatus(name, status string) {
 	if status == successStatus {
-		log.Printf( repoCreatedInfo, name)
+		log.Printf(repoCreatedInfo, name)
 	} else if status == foundStatus {
 		log.Printf(repoExistsInfo, name)
 	} else {
