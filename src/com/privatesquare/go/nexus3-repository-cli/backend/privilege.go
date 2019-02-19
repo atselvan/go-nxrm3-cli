@@ -11,7 +11,7 @@ import (
 func ListPrivileges(name string) {
 	if name != "" {
 		privilege := getPrivilege(name)
-		fmt.Printf("%+v/n", privilege)
+		fmt.Printf("%+v\n", privilege)
 	} else {
 		pNames := getPrivilegeNames()
 		printStringSlice(pNames)
@@ -73,7 +73,6 @@ func DeletePrivilege(name string) {
 		os.Exit(1)
 	}
 	if privilegeExists(name) {
-		fmt.Println(getPrivilegeID(name))
 		payload, err := json.Marshal(m.Privilege{ID: getPrivilegeID(name)})
 		logJsonMarshalError(err, jsonMarshalError)
 		result := RunScript(deletePrivilegeScript, string(payload))
@@ -86,7 +85,7 @@ func DeletePrivilege(name string) {
 }
 
 func getPrivileges() []m.Privilege {
-	payload, err := json.Marshal(m.Repository{})
+	payload, err := json.Marshal(m.Privilege{})
 	logJsonMarshalError(err, getfuncName())
 	result := RunScript(getPrivilegesScript, string(payload))
 	return result.Privileges
@@ -121,14 +120,7 @@ func getPrivilegeNames() []string {
 }
 
 func getPrivilegeID(name string) string {
-	var id string
-	privileges := getPrivileges()
-	for _, p := range privileges {
-		if p.Name == name {
-			id = p.ID
-		}
-	}
-	return id
+	return getPrivilege(name).ID
 }
 
 func privilegeExists(name string) bool {
