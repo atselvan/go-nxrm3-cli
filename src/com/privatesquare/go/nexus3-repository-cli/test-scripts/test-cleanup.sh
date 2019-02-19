@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CLI="./nexus3-repository-cli"
+CLI="../nexus3-repository-cli"
 repoFormat=("maven" "npm" "nuget" "bower" "pypi" "raw" "rubygems" "yum")
 
 cleanUpInitialRepositories() {

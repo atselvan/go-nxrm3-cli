@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CLI="./nexus3-repository-cli"
+CLI="../nexus3-repository-cli"
 
 printf "****************************************************************************************************\n"
 $CLI selector -skip-tls -task create -name maven-selector -expression "format == \"maven2\" and coordinate.groupId =^ \"com.company\""
