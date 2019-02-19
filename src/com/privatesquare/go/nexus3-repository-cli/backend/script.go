@@ -118,7 +118,6 @@ func RunScript(scriptName, payload string) m.ScriptResult {
 		output m.ScriptOutput
 		result m.ScriptResult
 	)
-	AddOrUpdateScript(scriptName)
 	url := fmt.Sprintf("%s/%s/%s/%s/run", NexusURL, apiBase, scriptAPI, scriptName)
 	req := createBaseRequest("POST", url, m.RequestBody{Text: payload})
 	respBody, status := httpRequest(req)
