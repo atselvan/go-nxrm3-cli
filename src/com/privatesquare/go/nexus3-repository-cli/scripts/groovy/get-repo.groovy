@@ -1,12 +1,20 @@
+// get-repo.groovy is a  Nexus3 Integration API definition to get repositories from Nexus
+
+// import libraries for json parsing
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 
-def input = new JsonSlurper().parseText(args)
-def repo = repository.getRepositoryManager().get(input.name)
+// input map
+Map input = new JsonSlurper().parseText(args)
 
-def output = [:]
+// getting repositories from nexus
+repo = repository.getRepositoryManager().get(input.name)
+
+// output map
+Map output = [:]
 
 if (repository.getRepositoryManager().exists(input.name)){
+    // return success status
     output.put("status", "200 OK")
     output.put("name", repo.name)
     output.put("url", repo.url)
@@ -15,7 +23,9 @@ if (repository.getRepositoryManager().exists(input.name)){
     output.put("recipe", repo.configuration.recipeName)
     output.put("attributes", repo.configuration.attributes)
 } else {
+    // return not found status
     output.put("status", "404 Not Found")
 }
 
-return JsonOutput.toJson(output)
+// return output in JSON format
+JsonOutput.toJson(output)

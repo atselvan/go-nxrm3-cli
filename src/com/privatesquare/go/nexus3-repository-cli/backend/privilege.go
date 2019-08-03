@@ -39,7 +39,7 @@ func CreatePrivilege(name, description, selectorName, repoName, action string) {
 
 func UpdatePrivilege(name, description, selectorName, repoName, action string) {
 	if name == "" {
-		log.Printf("%s : %s", getfuncName(), privilegeNameRequiredInfo)
+		log.Printf("%s : %s", getfuncName(), nameRequiredInfo)
 		os.Exit(1)
 	}
 	privilege := getPrivilege(name)
@@ -69,7 +69,7 @@ func UpdatePrivilege(name, description, selectorName, repoName, action string) {
 
 func DeletePrivilege(name string) {
 	if name == "" {
-		log.Printf("%s : %s", getfuncName(), privilegeNameRequiredInfo)
+		log.Printf("%s : %s", getfuncName(), nameRequiredInfo)
 		os.Exit(1)
 	}
 	if privilegeExists(name) {
@@ -93,7 +93,7 @@ func getPrivileges() []m.Privilege {
 
 func getPrivilege(name string) m.Privilege {
 	if name == "" {
-		log.Printf("%s : %s", getfuncName(), privilegeNameRequiredInfo)
+		log.Printf("%s : %s", getfuncName(), nameRequiredInfo)
 		os.Exit(1)
 	}
 	var privilege m.Privilege
@@ -166,11 +166,9 @@ func validateRepoForPriv(repoName string) string {
 	for _, format := range RepoFormats {
 		allowedFormats = append(allowedFormats, fmt.Sprintf("*-%s", validateRepositoryFormat(format)))
 	}
-	if !entryExists(allowedFormats, repoName) {
-		if !repositoryExists(repoName) {
-			log.Printf("%s : "+repositoryNotFoundInfo, getfuncName(), repoName)
-			os.Exit(1)
-		}
+	if !entryExists(allowedFormats, repoName) && !repositoryExists(repoName) {
+		log.Printf("%s : "+repositoryNotFoundInfo, getfuncName(), repoName)
+		os.Exit(1)
 	}
 	return repoName
 }

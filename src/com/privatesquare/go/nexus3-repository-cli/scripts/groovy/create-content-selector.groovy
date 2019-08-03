@@ -1,25 +1,40 @@
+// create-content-selector.groovy is a  Nexus3 Integration API definition to create a content selector in Nexus
+
+// import libraries for json parsing
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
-import org.sonatype.nexus.selector.*
+// Importing Nexus SelectorManager function from nexus-selector jar file
+import org.sonatype.nexus.selector.SelectorManager
+// Importing Nexus SelectorConfiguration function from nexus-selector jar file
+import org.sonatype.nexus.selector.SelectorConfiguration
 
-def input = new JsonSlurper().parseText(args)
-output = [:]
+// input map
+Map input = new JsonSlurper().parseText(args)
 
-def selectorManager = container.lookup(SelectorManager.class.name)
+// output map
+Map output = [:]
 
-configuration = new SelectorConfiguration(
+selectorManager = container.lookup(SelectorManager)
+
+// selector configuration map
+configMap = [
         name: input.name,
         type: input.type,
         description: input.description,
-        attributes: input.attributes
-)
+        attributes: input.attributes,
+]
+
+configuration = new SelectorConfiguration(configMap)
 
 selectorManager.create(configuration)
 
-output.put("status", "200 OK")
+// output request status
+output.put('status', '200 OK')
 
-log.info("***********************************************")
-log.info(String.format("Content selector %s is created", input.name))
-log.info("***********************************************")
+// nexus logger
+log.info('**********************************************')
+log.info(String.format('Content selector %s is created', input.name))
+log.info('********************************************')
 
-return JsonOutput.toJson(output)
+// return output in JSON format
+JsonOutput.toJson(output)

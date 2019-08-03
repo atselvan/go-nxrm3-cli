@@ -51,10 +51,10 @@ type HttpClientAuth struct {
 }
 
 type Docker struct {
-	HTTPPort       int  `json:"httpPort"`
-	HTTPSPort      int  `json:"httpsPort"`
-	ForceBasicAuth bool `json:"forceBasicAuth"`
-	V1Enabled      bool `json:"v1Enabled"`
+	HTTPPort       float64 `json:"httpPort"`
+	HTTPSPort      float64 `json:"httpsPort"`
+	ForceBasicAuth bool    `json:"forceBasicAuth"`
+	V1Enabled      bool    `json:"v1Enabled"`
 }
 
 type DockerProxy struct {

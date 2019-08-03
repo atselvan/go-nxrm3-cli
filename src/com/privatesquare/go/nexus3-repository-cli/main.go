@@ -36,8 +36,8 @@ func main() {
 	repoMembers := repoCommand.String(b.RepoMembersFlag, "", b.RepoMembersUsage)
 	proxyUser := repoCommand.String(b.ProxyUserFlag, "", b.ProxyUserUsage)
 	proxyPass := repoCommand.String(b.ProxyPassFlag, "", b.ProxyPassUsage)
-	dockerHttpPort := repoCommand.Int(b.DockerHttpPortFlag, 0, b.DockerHttpPortUsage)
-	dockerHttpsPort := repoCommand.Int(b.DockerHttpsPortFlag, 0, b.DockerHttpsPortUsage)
+	dockerHttpPort := repoCommand.Float64(b.DockerHttpPortFlag, 0, b.DockerHttpPortUsage)
+	dockerHttpsPort := repoCommand.Float64(b.DockerHttpsPortFlag, 0, b.DockerHttpsPortUsage)
 	blobStoreName := repoCommand.String(b.BlobStoreNameFlag, "", b.BlobStoreNameUsage)
 	releases := repoCommand.Bool(b.ReleaseFlag, false, b.ReleaseUsage)
 	rcSkipTLS := repoCommand.Bool(b.SkipTlsFlag, false, b.SkipTlsUsage)
@@ -46,7 +46,7 @@ func main() {
 	// selector flags
 	selectorTask := selectorCommand.String(b.TaskFlag, "", "")
 	selectorName := selectorCommand.String(b.SelectorNameFlag, "", b.SelectorNameUsage)
-	selectorDesc := selectorCommand.String(b.SelectorDescFlag, "", b.SelectorDescUsage)
+	selectorDesc := selectorCommand.String(b.DescFlag, "", b.SelectorDescUsage)
 	expression := selectorCommand.String(b.SelectorExpressionFlag, "", b.SelectorExpressionUsage)
 	csSkipTLS := selectorCommand.Bool(b.SkipTlsFlag, false, b.SkipTlsUsage)
 	csDebug := selectorCommand.Bool(b.DebugFlag, false, b.DebugUsage)
@@ -55,7 +55,7 @@ func main() {
 	privilegeTask := privilegeCommand.String(b.TaskFlag, "", b.PrivilegeTaskUsage)
 	privilegeName := privilegeCommand.String(b.PrivilegeNameFlag, "", b.PrivilegeNameUsage)
 	pSelectorName := privilegeCommand.String(b.PSelectorNameFlag, "", b.SelectorNameUsage)
-	privilegeDesc := privilegeCommand.String(b.PrivilegeDescFlag, "", b.PrivilegeDescUsage)
+	privilegeDesc := privilegeCommand.String(b.DescFlag, "", b.PrivilegeDescUsage)
 	pRepoName := privilegeCommand.String(b.PRepoNameFlag, "", b.RepoNameUsage)
 	action := privilegeCommand.String(b.ActionFlag, "", b.ActionUsage)
 	pSkipTLS := privilegeCommand.Bool(b.SkipTlsFlag, false, b.SkipTlsUsage)
@@ -64,11 +64,10 @@ func main() {
 	//role flags
 	roleTask := roleCommand.String(b.TaskFlag, "", b.RoleTaskUsage)
 	roleID := roleCommand.String(b.RoleIDFlag, "", b.RoleIDUsage)
-	roleDesc := roleCommand.String(b.RoleDescFlag, "", b.RoleDescUsage)
+	roleDesc := roleCommand.String(b.DescFlag, "", b.RoleDescUsage)
 	roleMembers := roleCommand.String(b.RoleMembersFlag, "", b.RoleMembersUsage)
 	rolePrivileges := roleCommand.String(b.RolePrivilegesFlag, "", b.RolePrivilegesUsage)
 	updateAction := roleCommand.String(b.UpdateActionFlag, "", b.UpdateActionUsage)
-
 	rSkipTLS := roleCommand.Bool(b.SkipTlsFlag, false, b.SkipTlsUsage)
 	rDebug := roleCommand.Bool(b.DebugFlag, false, b.DebugUsage)
 	rVerbose := roleCommand.Bool(b.VerboseFlag, false, b.VerboseUsage)
@@ -130,21 +129,21 @@ func main() {
 		b.Verbose = *scVerbose
 		// run tasks
 		switch *scriptTask {
-		case "list":
+		case b.ListTask:
 			b.ListScripts(*scriptName)
-		case "add":
+		case b.AddTask:
 			b.Debug = true
 			b.AddScript(*scriptName)
-		case "update":
+		case b.UpdateTask:
 			b.Debug = true
 			b.UpdateScript(*scriptName)
-		case "add-or-update":
+		case b.AddOrUpdateTask:
 			b.Debug = true
 			b.AddOrUpdateScript(*scriptName)
-		case "delete":
+		case b.DeleteTask:
 			b.Debug = true
 			b.DeleteScript(*scriptName)
-		case "run":
+		case b.RunTask:
 			b.Debug = true
 			b.RunScript(*scriptName, *scriptPayload)
 		default:
@@ -177,7 +176,7 @@ func main() {
 		b.Verbose = *rcVerbose
 		// run tasks
 		switch *repoTask {
-		case "list":
+		case b.ListTask:
 			b.ListRepositories(*repoName, *repoFormat)
 		case "create-hosted":
 			b.CreateHosted(*repoName, *blobStoreName, *repoFormat, *dockerHttpPort, *dockerHttpsPort, *releases)
@@ -189,7 +188,7 @@ func main() {
 			b.AddMembersToGroup(*repoName, *repoFormat, *repoMembers)
 		case "remove-group-members":
 			b.RemoveMembersFromGroup(*repoName, *repoFormat, *repoMembers)
-		case "delete":
+		case b.DeleteTask:
 			b.DeleteRepository(*repoName)
 		default:
 			repoCommand.Usage()
@@ -212,13 +211,13 @@ func main() {
 		b.Verbose = *csVerbose
 		// run tasks
 		switch *selectorTask {
-		case "list":
+		case b.ListTask:
 			b.ListSelectors(*selectorName)
-		case "create":
+		case b.CreateTask:
 			b.CreateSelector(*selectorName, *selectorDesc, *expression)
-		case "update":
+		case b.UpdateTask:
 			b.UpdateSelector(*selectorName, *selectorDesc, *expression)
-		case "delete":
+		case b.DeleteTask:
 			b.DeleteSelector(*selectorName)
 		default:
 			selectorCommand.Usage()
@@ -241,13 +240,13 @@ func main() {
 		b.Verbose = *pVerbose
 		// run tasks
 		switch *privilegeTask {
-		case "list":
+		case b.ListTask:
 			b.ListPrivileges(*privilegeName)
-		case "create":
+		case b.CreateTask:
 			b.CreatePrivilege(*privilegeName, *privilegeDesc, *pSelectorName, *pRepoName, *action)
-		case "update":
+		case b.UpdateTask:
 			b.UpdatePrivilege(*privilegeName, *privilegeDesc, *pSelectorName, *pRepoName, *action)
-		case "delete":
+		case b.DeleteTask:
 			b.DeletePrivilege(*privilegeName)
 		default:
 			privilegeCommand.Usage()
@@ -270,13 +269,13 @@ func main() {
 		b.Verbose = *rVerbose
 		// run tasks
 		switch *roleTask {
-		case "list":
+		case b.ListTask:
 			b.ListRoles(*roleID)
-		case "create":
+		case b.CreateTask:
 			b.CreateRole(*roleID, *roleDesc, *roleMembers, *rolePrivileges)
-		case "update":
+		case b.UpdateTask:
 			b.UpdateRole(*roleID, *roleDesc, *roleMembers, *rolePrivileges, *updateAction)
-		case "delete":
+		case b.DeleteTask:
 			b.DeleteRole(*roleID)
 		default:
 			roleCommand.Usage()

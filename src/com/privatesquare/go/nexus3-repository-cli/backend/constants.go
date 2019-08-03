@@ -2,6 +2,8 @@ package backend
 
 const (
 	ConfFileName = "nexus3-repository-cli.json"
+	CLIName      = "nexus3-repository-cli"
+	CLIMainUsage = "Usage: %s %s [args] [options]\n\n"
 
 	// API Extensions
 	apiBase        = "service/rest"
@@ -58,6 +60,18 @@ const (
 	TaskNotValidInfo = "%q is not a valid %s task. Available tasks : %+q\n"
 	setVerboseInfo   = "There was an error calling the function. Set verbose flag for more information"
 
+	nameRequiredInfo = "name is a required parameter"
+
+	DescFlag = "description"
+
+	ListTask        = "list"
+	CreateTask      = "create"
+	UpdateTask      = "update"
+	DeleteTask      = "delete"
+	AddTask         = "add"
+	AddOrUpdateTask = "add-or-update"
+	RunTask         = "run"
+
 	//script
 	ScriptTaskUsage = "Script Task (Required)  (For all tasks the script(s) should exist under the path ./scripts/groovy)\n\n" +
 		"    list 	    List all the scripts available in Nexus. (Optional: name) If script name is passed the contents of the script will be printed\n" +
@@ -72,14 +86,13 @@ const (
 	ScriptPayloadFlag  = "payload"
 	ScriptPayloadUsage = "Arguments can be passed to a nexus script as a payload during script execution"
 
-	scriptNameRequiredInfo = "name is a required parameter"
-	scriptAddedInfo        = "The script %q is added to nexus\n"
-	scriptUpdatedInfo      = "The script %q is updated in nexus\n"
-	scriptDeletedInfo      = "The script %q is deleted from nexus\n"
-	scriptRunSuccessInfo   = "The script %q was executed successfully\n"
-	scriptRunNotFoundInfo  = "The script %q was not found in nexus. Make sure you add the script to nexus before executing the script\n"
-	scriptExistsInfo       = "The script %q already exists in nexus\n"
-	scriptNotfoundInfo     = "The script %q was not found in nexus\n"
+	scriptAddedInfo       = "The script %q is added to nexus\n"
+	scriptUpdatedInfo     = "The script %q is updated in nexus\n"
+	scriptDeletedInfo     = "The script %q is deleted from nexus\n"
+	scriptRunSuccessInfo  = "The script %q was executed successfully\n"
+	scriptRunNotFoundInfo = "The script %q was not found in nexus. Make sure you add the script to nexus before executing the script\n"
+	scriptExistsInfo      = "The script %q already exists in nexus\n"
+	scriptNotfoundInfo    = "The script %q was not found in nexus\n"
 
 	//scripts
 	getRepoScript            = "get-repo"
@@ -131,7 +144,6 @@ const (
 	ReleaseUsage         = "Set this flag to create a releases repository"
 
 	RepoFormatNotValidInfo        = "%q is not a valid repository format. Available repository formats are : %v\n"
-	repoNameRequiredInfo          = "name is a required parameter"
 	repoFormatRequiredInfo        = "format is a required parameter"
 	hostedRepoRequiredInfo        = "name and format are required parameters to create a hosted repository"
 	proxyRepoRequiredInfo         = "name, format and remote-url are required parameters to create a proxy repository"
@@ -168,13 +180,11 @@ const (
 
 	SelectorNameFlag        = "name"
 	SelectorNameUsage       = "Content Selector name"
-	SelectorDescFlag        = "description"
 	SelectorDescUsage       = "Content Selector description"
 	SelectorExpressionFlag  = "expression"
 	SelectorExpressionUsage = "Pattern expression for the content selector"
 
 	defaultContentSelectorDescription = "Custom content-selector created from the CLI"
-	selectorNameRequiredInfo          = "name is a required parameter"
 	createSelectorRequiredInfo        = "name and expression are required parameters"
 	createSelectorSuccessInfo         = "Content selector %q was created\n"
 	updateSelectorSuccessInfo         = "Content selector %q was updated\n"
@@ -195,11 +205,9 @@ const (
 	PRepoNameFlag      = "repo-name"
 	ActionFlag         = "action"
 	ActionUsage        = "Privilege Action. Available actions %+q"
-	PrivilegeDescFlag  = "description"
 	PrivilegeDescUsage = "Privilege description"
 
 	defaultPrivilegeDescription = "Custom privilege created from the CLI"
-	privilegeNameRequiredInfo   = "name is a required parameter"
 	privilegeNotFoundInfo       = "Privilege %q was not found in nexus\n"
 	privilegeExistsInfo         = "Privilege %q already exists\n"
 	createPrivilegeRequiredInfo = "name, selector-name and repo-name are required parameters"
@@ -216,7 +224,6 @@ const (
 
 	RoleIDFlag          = "id"
 	RoleIDUsage         = "Role ID"
-	RoleDescFlag        = "description"
 	RoleDescUsage       = "Role description"
 	RoleMembersFlag     = "role-members"
 	RoleMembersUsage    = "Comma separated role member id's to be added to a role"
@@ -238,7 +245,7 @@ const (
 	updateRoleSuccessInfo         = "Role %q is updated\n"
 	deleteRoleSuccessInfo         = "Role %q is deleted\n"
 	roleItemsRequiredInfo         = "%s : You need to provide at least one valid role member or role privilege during role creation\n"
-	noRoleMemberProvidedInfo      = "No role members are provided to add to the role"
+	noRoleMemberProvidedInfo      = "No role members are provided to add/remove to/from the role"
 	noValidRoleMemberInfo         = "No valid role members are provided to add to the role"
 	cannotBeSameRoleInfo          = "Role member %q == role id %s, cannot add a role as a member in the same role"
 	roleMemberNotFoundInfo        = "Role %q was not found in nexus, hence it cannot be added to the role"

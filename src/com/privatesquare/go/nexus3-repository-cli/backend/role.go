@@ -36,8 +36,7 @@ func CreateRole(id, description, roleMembers, rolePrivileges string) {
 		validRoleMembers := validateRoleMembers(id, roleMembers)
 		validRolePrivileges := validateRolePrivileges(rolePrivileges)
 		if len(validRoleMembers)+len(validRolePrivileges) < 1 {
-			log.Printf("%s : You need to provide atleast one valid role member or role privilege during role creation", getfuncName())
-			os.Exit(1)
+			log.Printf("%s : You are creating a role without any valid role member or role privilege", getfuncName())
 		}
 		role := m.Role{RoleID: id, Name: id, Description: getRoleDesc(description), Source: getRoleSource(), Roles: validRoleMembers, Privileges: validRolePrivileges}
 		payload, err := json.Marshal(role)
@@ -122,7 +121,7 @@ func UpdateRole(id, description, roleMembers, rolePrivileges, updateAction strin
 			log.Printf(roleNotFoundInfo, id)
 		}
 		if !roleExists(id) {
-			role := m.Role{RoleID: id, Name: id, Description: description, Source: getRoleSource(), Roles: role.Roles, Privileges: role.Privileges}
+			role := m.Role{RoleID: id, Name: id, Description: role.Description, Source: getRoleSource(), Roles: role.Roles, Privileges: role.Privileges}
 			payload, err := json.Marshal(role)
 			logJsonMarshalError(err, jsonMarshalError)
 			result := RunScript(createRoleScript, string(payload))
@@ -130,9 +129,17 @@ func UpdateRole(id, description, roleMembers, rolePrivileges, updateAction strin
 				log.Printf("%s : %s", getfuncName(), setVerboseInfo)
 			}
 		}
-		fmt.Printf(updateRoleSuccessInfo, id)
+		log.Printf(updateRoleSuccessInfo, id)
 	} else {
 		log.Printf(roleNotFoundInfo, id)
+	}
+}
+
+func CreateOrUpdateRole(id, description, roleMembers, rolePrivileges, updateAction string) {
+	if !roleExists(id) {
+		CreateRole(id, description, roleMembers, rolePrivileges)
+	} else {
+		UpdateRole(id, description, roleMembers, rolePrivileges, updateAction)
 	}
 }
 
@@ -156,7 +163,7 @@ func DeleteRole(id string) {
 }
 
 func getRoles() []m.Role {
-	payload, err := json.Marshal(m.Privilege{})
+	payload, err := json.Marshal(m.Role{})
 	logJsonMarshalError(err, getfuncName())
 	result := RunScript(getRoleScript, string(payload))
 	return result.Roles
@@ -172,7 +179,6 @@ func getRole(id string) m.Role {
 	}
 	if role.RoleID == "" {
 		log.Printf(roleNotFoundInfo, id)
-		os.Exit(1)
 	}
 	return role
 }
@@ -239,11 +245,15 @@ func validateRolePrivileges(rolePrivileges string) []string {
 			if privilegeExists(rp) {
 				validList = append(validList, getPrivilegeID(rp))
 			} else {
-				log.Printf(rolePrivilegeNotFoundInfo, rp)
+				if Debug {
+					log.Printf(rolePrivilegeNotFoundInfo, rp)
+				}
 			}
 		}
 		if len(validList) < 1 {
-			log.Println(noValidRolePrivilegeInfo)
+			if Debug {
+				log.Println(noValidRolePrivilegeInfo)
+			}
 		}
 	} else {
 		log.Println(noRolePrivilegesIProvidedInfo)

@@ -19,7 +19,7 @@ func ListRepositories(name, format string) {
 	} else if name == "" && format == "" {
 		repositoryList = getRepositoryList()
 	} else {
-		repositoryList = getRepositoryListByFormat(validateRepositoryFormat(name))
+		repositoryList = getRepositoryListByFormat(validateRepositoryFormat(format))
 	}
 	if name == "" {
 		printStringSlice(repositoryList)
@@ -27,7 +27,7 @@ func ListRepositories(name, format string) {
 	}
 }
 
-func CreateHosted(name, blobStoreName, format string, dockerHttpPort, dockerHttpsPort int, releases bool) {
+func CreateHosted(name, blobStoreName, format string, dockerHttpPort, dockerHttpsPort float64, releases bool) {
 	if name == "" || format == "" {
 		log.Printf("%s : %s", getfuncName(), hostedRepoRequiredInfo)
 		os.Exit(1)
@@ -59,7 +59,7 @@ func CreateHosted(name, blobStoreName, format string, dockerHttpPort, dockerHttp
 	printCreateRepoStatus(name, result.Status)
 }
 
-func CreateProxy(name, blobStoreName, format, remoteURL, proxyUsername, proxyPassword string, dockerHttpPort, dockerHttpsPort int, releases bool) {
+func CreateProxy(name, blobStoreName, format, remoteURL, proxyUsername, proxyPassword string, dockerHttpPort, dockerHttpsPort float64, releases bool) {
 	if name == "" || remoteURL == "" || format == "" {
 		log.Printf("%s : %s", getfuncName(), proxyRepoRequiredInfo)
 		os.Exit(1)
@@ -99,7 +99,7 @@ func CreateProxy(name, blobStoreName, format, remoteURL, proxyUsername, proxyPas
 	printCreateRepoStatus(name, result.Status)
 }
 
-func CreateGroup(name, blobStoreName, format, repoMembers string, dockerHttpPort, dockerHttpsPort int, releases bool) {
+func CreateGroup(name, blobStoreName, format, repoMembers string, dockerHttpPort, dockerHttpsPort float64, releases bool) {
 	if name == "" || repoMembers == "" || format == "" {
 		log.Printf("%s : %s", getfuncName(), groupRequiredInfo)
 		os.Exit(1)
@@ -200,7 +200,7 @@ func RemoveMembersFromGroup(name, format, repoMembers string) {
 
 func DeleteRepository(name string) {
 	if name == "" {
-		log.Printf("%s : %s", getfuncName(), repoNameRequiredInfo)
+		log.Printf("%s : %s", getfuncName(), nameRequiredInfo)
 		os.Exit(1)
 	}
 	payload, err := json.Marshal(m.Repository{Name: name})
@@ -211,14 +211,20 @@ func DeleteRepository(name string) {
 
 func getRepository(name string) m.Repository {
 	if name == "" {
-		log.Printf("%s : %s", getfuncName(), repoNameRequiredInfo)
+		log.Printf("%s : %s", getfuncName(), nameRequiredInfo)
 		os.Exit(1)
 	}
-	payload, err := json.Marshal(m.Repository{Name: name})
-	logJsonMarshalError(err, getfuncName())
-	result := RunScript(getRepoScript, string(payload))
-	if result.Status != successStatus {
-		log.Printf("%s : %s", getfuncName(), setVerboseInfo)
+	var result m.ScriptResult
+	if repositoryExists(name) {
+		payload, err := json.Marshal(m.Repository{Name: name})
+		logJsonMarshalError(err, getfuncName())
+		result = RunScript(getRepoScript, string(payload))
+		if result.Status != successStatus {
+			log.Printf("%s : %s", getfuncName(), setVerboseInfo)
+			os.Exit(1)
+		}
+	} else {
+		log.Printf("%s : %s", getfuncName(), fmt.Sprintf(repositoryNotFoundInfo, name))
 		os.Exit(1)
 	}
 	return m.Repository{Name: result.Name, URL: result.URL, Type: result.Type, Format: result.Format, Recipe: result.Recipe, Attributes: result.Attributes}
@@ -261,7 +267,7 @@ func getRepositoryListByFormat(format string) []string {
 
 func repositoryExists(name string) bool {
 	if name == "" {
-		log.Printf("%s : %s", getfuncName(), repoNameRequiredInfo)
+		log.Printf("%s : %s", getfuncName(), nameRequiredInfo)
 		os.Exit(1)
 	}
 	var isExists bool

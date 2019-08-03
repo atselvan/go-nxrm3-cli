@@ -103,6 +103,8 @@ func httpRequest(req *http.Request) ([]byte, string) {
 	return respBody, resp.Status
 }
 
+// fileExists - Checks if a file exists
+// @fileName: name or path to the file
 func fileExists(fileName string) bool {
 	if _, err := os.Stat(fileName); err != nil {
 		if os.IsNotExist(err) {
@@ -112,6 +114,17 @@ func fileExists(fileName string) bool {
 	return true
 }
 
+// createFile - creates a new file
+// @fileName: name or path to the file
+func createFile(fileName string) *os.File {
+	f, err := os.Create(fileName)
+	logError(err, fmt.Sprintf("There was an error while creating the file %s", fileName))
+	return f
+}
+
+// readFile - reads a file and returns the data in string format.
+// The function checks if the file exists or not before reading the file
+// @fileName: name or path to the file
 func readFile(fileName string) string {
 	var (
 		data []byte
@@ -131,9 +144,36 @@ func readFile(fileName string) string {
 	return string(data)
 }
 
+// readStringSliceFromFile - reads the data from a file and inputs every new line into a slice and returns the slice
+// @fileName: name or path to the file
+func readStringSliceFromFile(fileName string) []string {
+	data := readFile(fileName)
+	return strings.Split(strings.TrimSpace(data), "\n")
+}
+
+// writeFile - writes data to a file.
+// If the file does not exists, a new file will be created
+// if the file exists then the file will be overwritten with the new data
+// @fileName: name or path to the file
+// @data: the data in []byte format
 func writeFile(fileName string, data []byte) {
 	err := ioutil.WriteFile(fileName, data, 0644)
 	logError(err, "There was an error writing to the file.")
+}
+
+// writeFile - writes a string slice to a file. Every new line will be written in a new line of the file
+// If the file does not exists, a new file will be created
+// if the file exists then the file will be overwritten with the new data
+// @fileName: name or path to the file
+// @slice: a string slice
+func writeStringSliceToFile(fileName string, slice []string) {
+	f := createFile(fileName)
+	sep := "\n"
+	for _, line := range slice {
+		if _, err := f.WriteString(line + sep); err != nil {
+			panic(err)
+		}
+	}
 }
 
 func printStringSlice(slice []string) {

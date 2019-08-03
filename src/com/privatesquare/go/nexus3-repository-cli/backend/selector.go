@@ -41,10 +41,9 @@ func CreateSelector(name, description, expression string) {
 	}
 }
 
-// TODO : Fix the java.lang.IllegalStateException: Missing entity-metadata during runtime
 func UpdateSelector(name, description, expression string) {
 	if name == "" {
-		log.Printf("%s : %s", getfuncName(), selectorNameRequiredInfo)
+		log.Printf("%s : %s", getfuncName(), nameRequiredInfo)
 		os.Exit(1)
 	}
 	if selectorExists(name) {
@@ -69,10 +68,9 @@ func UpdateSelector(name, description, expression string) {
 	}
 }
 
-// TODO : Fix the java.lang.IllegalStateException: Missing entity-metadata during runtime
 func DeleteSelector(name string) {
 	if name == "" {
-		log.Printf("%s : %s", getfuncName(), selectorNameRequiredInfo)
+		log.Printf("%s : %s", getfuncName(), nameRequiredInfo)
 		os.Exit(1)
 	}
 	if selectorExists(name) {
@@ -100,7 +98,7 @@ func getSelectors() []m.ContentSelector {
 
 func getSelector(name string) m.ContentSelector {
 	if name == "" {
-		log.Printf("%s : %s", getfuncName(), selectorNameRequiredInfo)
+		log.Printf("%s : %s", getfuncName(), nameRequiredInfo)
 		os.Exit(1)
 	}
 	var contentSelector m.ContentSelector

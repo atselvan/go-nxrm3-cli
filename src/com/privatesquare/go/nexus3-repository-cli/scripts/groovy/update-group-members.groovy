@@ -17,29 +17,22 @@ if (repository.getRepositoryManager().exists(input.name)){
     repo = repository.repositoryManager.update(configuration)
     attributes = repo.getConfiguration().getAttributes()
 
+    // output success status
     output.put("status", "200 OK")
     output.put("name", repo.name)
     output.put("url", repo.url)
     output.put("recipe", repo.configuration.recipeName)
     output.put("attributes", attributes)
 
+    // nexus logger
     log.info("***********************************************")
     log.info(String.format("Repository %s is updated!!!", repo.name))
-    log.info("***********************************************")
-
+    log.info("**********************************************")
+    // return output in JSON format
     return JsonOutput.toJson(output)
 } else {
+    // output not found status
     output.put("status", "404 Not Found")
+    // return output in JSON format
     return JsonOutput.toJson(output)
 }
-
-
-
-
-
-
-
-
-
-
-

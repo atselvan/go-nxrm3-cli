@@ -27,7 +27,7 @@ func ListScripts(name string) {
 
 func AddScript(name string) {
 	if name == "" {
-		log.Printf("%s : %s", getfuncName(), scriptNameRequiredInfo)
+		log.Printf("%s : %s", getfuncName(), nameRequiredInfo)
 		os.Exit(1)
 	}
 	url := fmt.Sprintf("%s/%s/%s", NexusURL, apiBase, scriptAPI)
@@ -51,7 +51,7 @@ func AddScript(name string) {
 
 func UpdateScript(name string) {
 	if name == "" {
-		log.Printf("%s : %s", getfuncName(), scriptNameRequiredInfo)
+		log.Printf("%s : %s", getfuncName(), nameRequiredInfo)
 		os.Exit(1)
 	}
 	url := fmt.Sprintf("%s/%s/%s/%s", NexusURL, apiBase, scriptAPI, name)
@@ -75,7 +75,7 @@ func UpdateScript(name string) {
 
 func AddOrUpdateScript(name string) {
 	if name == "" {
-		log.Printf("%s : %s", getfuncName(), scriptNameRequiredInfo)
+		log.Printf("%s : %s", getfuncName(), nameRequiredInfo)
 		os.Exit(1)
 	}
 	if !scriptExists(name) {
@@ -87,7 +87,7 @@ func AddOrUpdateScript(name string) {
 
 func DeleteScript(name string) {
 	if name == "" {
-		log.Printf("%s : %s", getfuncName(), scriptNameRequiredInfo)
+		log.Printf("%s : %s", getfuncName(), nameRequiredInfo)
 		os.Exit(1)
 	}
 	url := fmt.Sprintf("%s/%s/%s/%s", NexusURL, apiBase, scriptAPI, name)
@@ -109,7 +109,7 @@ func DeleteScript(name string) {
 
 func RunScript(name, payload string) m.ScriptResult {
 	if name == "" {
-		log.Printf("%s : %s", getfuncName(), scriptNameRequiredInfo)
+		log.Printf("%s : %s", getfuncName(), nameRequiredInfo)
 		os.Exit(1)
 	}
 	var (
@@ -160,7 +160,7 @@ func getScripts() []string {
 
 func getScript(name string) m.Script {
 	if name == "" {
-		log.Printf("%s : %s", getfuncName(), scriptNameRequiredInfo)
+		log.Printf("%s : %s", getfuncName(), nameRequiredInfo)
 		os.Exit(1)
 	}
 	var (
@@ -184,7 +184,7 @@ func getScript(name string) m.Script {
 
 func getScriptPath(name string) string {
 	if name == "" {
-		log.Printf("%s : %s", getfuncName(), scriptNameRequiredInfo)
+		log.Printf("%s : %s", getfuncName(), nameRequiredInfo)
 		os.Exit(1)
 	}
 	return fmt.Sprintf("%s/%s.groovy", scriptBasePath, name)
@@ -192,7 +192,7 @@ func getScriptPath(name string) string {
 
 func scriptExists(name string) bool {
 	if name == "" {
-		log.Printf("%s : %s", getfuncName(), scriptNameRequiredInfo)
+		log.Printf("%s : %s", getfuncName(), nameRequiredInfo)
 		os.Exit(1)
 	}
 	url := fmt.Sprintf("%s/%s/%s/%s", NexusURL, apiBase, scriptAPI, name)

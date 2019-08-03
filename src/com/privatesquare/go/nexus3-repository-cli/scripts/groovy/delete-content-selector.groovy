@@ -1,25 +1,29 @@
+// delete-content-selector.groovy is a  Nexus3 Integration API definition to delete a content selector from Nexus
+
+// import libraries for json parsing
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
-import org.sonatype.nexus.selector.*
+// import Nexus SelectorManager function from nexus-selector log file
+import org.sonatype.nexus.selector.SelectorManager
 
-def input = new JsonSlurper().parseText(args)
-output = [:]
+// input map
+Map input = new JsonSlurper().parseText(args)
+// output map
+Map output = [:]
 
-def selectorManager = container.lookup(SelectorManager.class.name)
+selectorManager = container.lookup(SelectorManager)
 
-configuration = new SelectorConfiguration(
-        name: input.name,
-        type: input.type,
-        description: input.description,
-        attributes: input.attributes
-)
-log.info(configuration.toString())
-selectorManager.delete(configuration)
+config = selectorManager.browse().find { it -> it.name == input.name }
 
-output.put("status", "200 OK")
+selectorManager.delete(config)
 
-log.info("***********************************************")
-log.info(String.format("Content selector %s is deleted", input.name))
-log.info("***********************************************")
+// output success status
+output.put('status', '200 OK')
 
+// nexus  logger
+log.info('***********************************************')
+log.info(String.format('Content selector %s is deleted', input.name))
+log.info('***********************************************')
+
+// return output in JSON format
 return JsonOutput.toJson(output)

@@ -1,17 +1,24 @@
+// get-privileges.groovy is a  Nexus3 Integration API definition to update a repository privilege in Nexus
+
+// import libraries for json parsing
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
-import org.sonatype.nexus.security.authz.*
-import org.sonatype.nexus.security.privilege.*
+// import nexus libraries from the nexus-security jar file
+import org.sonatype.nexus.security.authz.AuthorizationManager
+import org.sonatype.nexus.security.privilege.Privilege
 
-def input = new JsonSlurper().parseText(args)
-output = [:]
+// input map
+Map input = new JsonSlurper().parseText(args)
+// output map
+Map output = [:]
 
-def authManager = container.lookup(AuthorizationManager.class.name)
+authManager = container.lookup(AuthorizationManager)
 
-def properties = [:]
-properties.put("contentSelector", input.properties.contentSelector)
-properties.put("repository", input.properties.repository)
-properties.put("actions", input.properties.actions)
+// privilege properties
+Map properties = [:]
+properties.put('contentSelector', input.properties.contentSelector)
+properties.put('repository', input.properties.repository)
+properties.put('actions', input.properties.actions)
 
 privilege = new Privilege(
         id: input.id,
@@ -24,11 +31,12 @@ privilege = new Privilege(
 
 authManager.updatePrivilege(privilege)
 
-output.put("status", "200 OK")
+// output success status
+output.put('status', '200 OK')
 
-log.info("***********************************************")
-log.info(String.format("Privilege %s is updates", input.name))
-log.info("***********************************************")
+log.info('***********************************************')
+log.info(String.format('Privilege %s is updates', input.name))
+log.info('**********************************************')
 
-return JsonOutput.toJson(output)
-
+// return output in JSON format
+JsonOutput.toJson(output)

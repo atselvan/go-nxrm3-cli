@@ -1,25 +1,33 @@
+// update-content-selector.groovy is a  Nexus3 Integration API definition to update a content selector in Nexus
+
+// import libraries for json parsing
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
-import org.sonatype.nexus.selector.*
+// import Nexus SelectorManager function from nexus-selector log file
+import org.sonatype.nexus.selector.SelectorManager
 
-def input = new JsonSlurper().parseText(args)
-output = [:]
+// input map
+Map input = new JsonSlurper().parseText(args)
+// output map
+Map output = [:]
 
-def selectorManager = container.lookup(SelectorManager.class.name)
+selectorManager = container.lookup(SelectorManager)
 
-configuration = new SelectorConfiguration(
-        name: input.name,
-        type: "csel",
-        description: input.description,
-        attributes: input.attributes
-)
+configuration = selectorManager.browse().find { it -> it.name == input.name }
+
+configuration.setDescription(input.description)
+
+configuration.setAttributes(input.attributes)
 
 selectorManager.update(configuration)
 
-output.put("status", "200 OK")
+// output success status
+output.put('status', '200 OK')
 
-log.info("***********************************************")
-log.info(String.format("Content selector %s is updated", input.name))
-log.info("***********************************************")
+//nexus logger
+log.info('***********************************************')
+log.info(String.format('Content selector %s is updated', input.name))
+log.info('**********************************************')
 
-return JsonOutput.toJson(output)
+// return output in JSON format
+JsonOutput.toJson(output)
