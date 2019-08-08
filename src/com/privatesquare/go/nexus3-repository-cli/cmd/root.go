@@ -29,6 +29,7 @@ func Execute() {
 func init() {
 	rootCmd.AddCommand(confCmd)
 	rootCmd.AddCommand(scriptsCmd)
+	rootCmd.AddCommand(repoCmd)
 
 	rootCmd.PersistentFlags().BoolP(SkipTlsFlag, "k", false, SkipTlsUsage)
 	rootCmd.PersistentFlags().BoolP(DebugFlag, "d", false, DebugUsage)
