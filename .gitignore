@@ -9,5 +9,12 @@
 # Maven target
 target/
 
+# go imports
+bin
+pkg
+**/github.com
+**/golang.org
+**/gopkg.in
+
 # cli executables
 src/com/privatesquare/go/nexus3-repository-cli/nexus3-repository-cli*
