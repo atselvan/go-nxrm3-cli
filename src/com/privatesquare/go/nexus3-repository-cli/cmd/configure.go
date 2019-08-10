@@ -10,8 +10,8 @@ import (
 
 // confCmd represents the configure command
 var confCmd = &cobra.Command{
-	Use:   ConfCommandFlag,
-	Short: ConfCommandUsage,
+	Use:     ConfCommandFlag,
+	Short:   ConfCommandUsage,
 	Example: "./nexus3-repository-cli configure --nexus-url http://nexus-domain --username user --password pass",
 	Run: func(cmd *cobra.Command, args []string) {
 		nexusURL, _ := cmd.Flags().GetString(NexusURLFlag)
@@ -30,4 +30,5 @@ func init() {
 	confCmd.MarkFlagRequired(NexusUsernameFlag)
 	confCmd.Flags().String(NexusPasswordFlag, "", NexusPasswordUsage)
 	confCmd.MarkFlagRequired(NexusPasswordFlag)
+	confCmd.Flags().SortFlags = false
 }

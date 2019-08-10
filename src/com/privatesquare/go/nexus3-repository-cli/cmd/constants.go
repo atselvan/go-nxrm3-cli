@@ -50,11 +50,11 @@ const (
 
 	//repo
 	RepoNameFlag         = "name"
-	RepoNameUsage        = "Nexus repository name"
+	RepoNameUsage        = "Nexus repository name (Required)"
 	RepoFormatFlag       = "format"
-	RepoFormatUsage      = "Repository format. Available formats : %+q"
-	RepoTypeFlag = "type"
-	RepoTypeUsage = "Repository Type. Available types : %+q"
+	RepoFormatUsage      = "Repository format. Available formats : %+q (Required)"
+	RepoTypeFlag         = "type"
+	RepoTypeUsage        = "Repository Type. Available types : %+q (Required)"
 	RemoteURLFlag        = "remote-url"
 	RemoteURLUsage       = "Remote URL to be proxied in nexus"
 	RepoMembersFlag      = "members"
@@ -97,6 +97,6 @@ const (
 	RolePrivilegesFlag  = "role-privileges"
 	RolePrivilegesUsage = "Comma separated privileges to be added to a role"
 
-	UpdateActionFlag         = "action"
-	UpdateActionUsage        = "Update Action. Available values = %+q\n"
+	UpdateActionFlag  = "action"
+	UpdateActionUsage = "Update Action. Available values = %+q\n"
 )
