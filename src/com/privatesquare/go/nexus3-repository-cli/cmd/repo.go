@@ -12,43 +12,43 @@ import (
 
 // repoCmd represents the repo command
 var repoCmd = &cobra.Command{
-	Use:   RepoCommandFlag,
-	Short: RepoCommandUsage,
+	Use:   repoCommandFlag,
+	Short: repoCommandUsage,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		nxrm.SetConnectionDetails()
-		nxrm.SkipTLSVerification, _ = cmd.Flags().GetBool(SkipTlsFlag)
-		nxrm.Debug, _ = cmd.Flags().GetBool(DebugFlag)
-		nxrm.Verbose, _ = cmd.Flags().GetBool(VerboseFlag)
+		nxrm.SkipTLSVerification, _ = cmd.Flags().GetBool(skipTlsFlag)
+		nxrm.Debug, _ = cmd.Flags().GetBool(debugFlag)
+		nxrm.Verbose, _ = cmd.Flags().GetBool(verboseFlag)
 	},
 }
 
 // lostRepoCmd represents the repo list command
 var listRepoCmd = &cobra.Command{
-	Use:   "list",
+	Use:   listTask,
 	Short: "List Repositories",
 	Run: func(cmd *cobra.Command, args []string) {
-		name, _ := cmd.Flags().GetString(RepoNameFlag)
-		format, _ := cmd.Flags().GetString(RepoFormatFlag)
+		name, _ := cmd.Flags().GetString(repoNameFlag)
+		format, _ := cmd.Flags().GetString(repoFormatFlag)
 		nxrm.ListRepositories(name, format)
 	},
 }
 
 // createRepoCmd represents the repo create command
 var createRepoCmd = &cobra.Command{
-	Use:   "create",
+	Use:   createTask,
 	Short: "Create Repositories",
 	Run: func(cmd *cobra.Command, args []string) {
-		name, _ := cmd.Flags().GetString(RepoNameFlag)
-		format, _ := cmd.Flags().GetString(RepoFormatFlag)
-		rType, _ := cmd.Flags().GetString(RepoTypeFlag)
-		members, _ := cmd.Flags().GetString(RepoMembersFlag)
-		remoteURL, _ := cmd.Flags().GetString(RemoteURLFlag)
-		proxyUser, _ := cmd.Flags().GetString(ProxyUserFlag)
-		proxyPass, _ := cmd.Flags().GetString(ProxyPassFlag)
-		dockerHttpPort, _ := cmd.Flags().GetFloat64(DockerHttpPortFlag)
-		dockerHttpsPort, _ := cmd.Flags().GetFloat64(DockerHttpsPortFlag)
-		blobStoreName, _ := cmd.Flags().GetString(BlobStoreNameFlag)
-		releases, _ := cmd.Flags().GetBool(ReleaseFlag)
+		name, _ := cmd.Flags().GetString(repoNameFlag)
+		format, _ := cmd.Flags().GetString(repoFormatFlag)
+		rType, _ := cmd.Flags().GetString(repoTypeFlag)
+		members, _ := cmd.Flags().GetString(repoMembersFlag)
+		remoteURL, _ := cmd.Flags().GetString(remoteURLFlag)
+		proxyUser, _ := cmd.Flags().GetString(proxyUserFlag)
+		proxyPass, _ := cmd.Flags().GetString(proxyPassFlag)
+		dockerHttpPort, _ := cmd.Flags().GetFloat64(dockerHttpPortFlag)
+		dockerHttpsPort, _ := cmd.Flags().GetFloat64(dockerHttpsPortFlag)
+		blobStoreName, _ := cmd.Flags().GetString(blobStoreNameFlag)
+		releases, _ := cmd.Flags().GetBool(releaseFlag)
 
 		switch rType {
 		case "hosted":
@@ -68,8 +68,8 @@ var addMembersCmd = &cobra.Command{
 	Use:   "addMembers",
 	Short: "Add more members to an existing group repository",
 	Run: func(cmd *cobra.Command, args []string) {
-		name, _ := cmd.Flags().GetString(RepoNameFlag)
-		members, _ := cmd.Flags().GetString(RepoMembersFlag)
+		name, _ := cmd.Flags().GetString(repoNameFlag)
+		members, _ := cmd.Flags().GetString(repoMembersFlag)
 		nxrm.AddMembersToGroup(name, members)
 	},
 }
@@ -79,18 +79,18 @@ var removeMembersCmd = &cobra.Command{
 	Use:   "removeMembers",
 	Short: "Remove members from an existing group repository",
 	Run: func(cmd *cobra.Command, args []string) {
-		name, _ := cmd.Flags().GetString(RepoNameFlag)
-		members, _ := cmd.Flags().GetString(RepoMembersFlag)
+		name, _ := cmd.Flags().GetString(repoNameFlag)
+		members, _ := cmd.Flags().GetString(repoMembersFlag)
 		nxrm.RemoveMembersFromGroup(name, members)
 	},
 }
 
 // deleteRepoCmd represents the repo delete command
 var deleteRepoCmd = &cobra.Command{
-	Use:   "delete",
+	Use:   deleteTask,
 	Short: "Delete Repositories",
 	Run: func(cmd *cobra.Command, args []string) {
-		name, _ := cmd.Flags().GetString(RepoNameFlag)
+		name, _ := cmd.Flags().GetString(repoNameFlag)
 		nxrm.DeleteRepository(name)
 	},
 }
@@ -102,36 +102,36 @@ func init() {
 	repoCmd.AddCommand(removeMembersCmd)
 	repoCmd.AddCommand(deleteRepoCmd)
 
-	listRepoCmd.Flags().String(RepoNameFlag, "", RepoNameUsage)
-	listRepoCmd.Flags().String(RepoFormatFlag, "", fmt.Sprintf(RepoFormatUsage, nxrm.RepoFormats))
+	listRepoCmd.Flags().String(repoNameFlag, "", repoNameUsage)
+	listRepoCmd.Flags().String(repoFormatFlag, "", fmt.Sprintf(repoFormatUsage, nxrm.RepoFormats))
 	listRepoCmd.Flags().SortFlags = false
 
-	createRepoCmd.Flags().String(RepoNameFlag, "", RepoNameUsage)
-	createRepoCmd.MarkFlagRequired(RepoNameFlag)
-	createRepoCmd.Flags().String(RepoFormatFlag, "", fmt.Sprintf(RepoFormatUsage, nxrm.RepoFormats))
-	createRepoCmd.MarkFlagRequired(RepoFormatFlag)
-	createRepoCmd.Flags().String(RepoTypeFlag, "", fmt.Sprintf(RepoTypeUsage, nxrm.RepoFormats))
-	createRepoCmd.MarkFlagRequired(RepoTypeFlag)
-	createRepoCmd.Flags().String(RemoteURLFlag, "", RemoteURLUsage)
-	createRepoCmd.Flags().String(ProxyUserFlag, "", ProxyUserUsage)
-	createRepoCmd.Flags().String(ProxyPassFlag, "", ProxyPassUsage)
-	createRepoCmd.Flags().String(DockerHttpPortFlag, "", DockerHttpPortUsage)
-	createRepoCmd.Flags().Float64(DockerHttpsPortFlag, 0, DockerHttpsPortUsage)
-	createRepoCmd.Flags().Float64(BlobStoreNameFlag, 0, BlobStoreNameUsage)
-	createRepoCmd.Flags().Bool(ReleaseFlag, false, ReleaseUsage)
+	createRepoCmd.Flags().String(repoNameFlag, "", repoNameUsage)
+	_ = createRepoCmd.MarkFlagRequired(repoNameFlag)
+	createRepoCmd.Flags().String(repoFormatFlag, "", fmt.Sprintf(repoFormatUsage, nxrm.RepoFormats))
+	_ = createRepoCmd.MarkFlagRequired(repoFormatFlag)
+	createRepoCmd.Flags().String(repoTypeFlag, "", fmt.Sprintf(repoTypeUsage, nxrm.RepoFormats))
+	_ = createRepoCmd.MarkFlagRequired(repoTypeFlag)
+	createRepoCmd.Flags().String(remoteURLFlag, "", remoteURLUsage)
+	createRepoCmd.Flags().String(proxyUserFlag, "", proxyUserUsage)
+	createRepoCmd.Flags().String(proxyPassFlag, "", proxyPassUsage)
+	createRepoCmd.Flags().String(dockerHttpPortFlag, "", dockerHttpPortUsage)
+	createRepoCmd.Flags().Float64(dockerHttpsPortFlag, 0, dockerHttpsPortUsage)
+	createRepoCmd.Flags().Float64(blobStoreNameFlag, 0, blobStoreNameUsage)
+	createRepoCmd.Flags().Bool(releaseFlag, false, releaseUsage)
 	createRepoCmd.Flags().SortFlags = false
 
-	addMembersCmd.Flags().String(RepoNameFlag, "", RepoNameUsage)
-	addMembersCmd.MarkFlagRequired(RepoNameFlag)
-	addMembersCmd.Flags().String(RepoMembersFlag, "", RepoMembersUsage)
-	addMembersCmd.MarkFlagRequired(RepoMembersFlag)
+	addMembersCmd.Flags().String(repoNameFlag, "", repoNameUsage)
+	_ = addMembersCmd.MarkFlagRequired(repoNameFlag)
+	addMembersCmd.Flags().String(repoMembersFlag, "", repoMembersUsage)
+	_ = addMembersCmd.MarkFlagRequired(repoMembersFlag)
 	addMembersCmd.Flags().SortFlags = false
 
-	removeMembersCmd.Flags().String(RepoNameFlag, "", RepoNameUsage)
-	removeMembersCmd.MarkFlagRequired(RepoNameFlag)
-	removeMembersCmd.Flags().String(RepoMembersFlag, "", RepoMembersUsage)
-	removeMembersCmd.MarkFlagRequired(RepoMembersFlag)
+	removeMembersCmd.Flags().String(repoNameFlag, "", repoNameUsage)
+	_ = removeMembersCmd.MarkFlagRequired(repoNameFlag)
+	removeMembersCmd.Flags().String(repoMembersFlag, "", repoMembersUsage)
+	_ = removeMembersCmd.MarkFlagRequired(repoMembersFlag)
 	removeMembersCmd.Flags().SortFlags = false
 
-	deleteRepoCmd.Flags().String(RepoNameFlag, "", RepoNameUsage)
+	deleteRepoCmd.Flags().String(repoNameFlag, "", repoNameUsage)
 }

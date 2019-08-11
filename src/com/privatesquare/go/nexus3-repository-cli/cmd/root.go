@@ -31,7 +31,7 @@ func init() {
 	rootCmd.AddCommand(scriptsCmd)
 	rootCmd.AddCommand(repoCmd)
 
-	rootCmd.PersistentFlags().BoolP(SkipTlsFlag, "k", false, SkipTlsUsage)
-	rootCmd.PersistentFlags().BoolP(DebugFlag, "d", false, DebugUsage)
-	rootCmd.PersistentFlags().BoolP(VerboseFlag, "v", false, VerboseUsage)
+	rootCmd.PersistentFlags().BoolP(skipTlsFlag, "k", false, skipTlsUsage)
+	rootCmd.PersistentFlags().BoolP(debugFlag, "d", false, debugUsage)
+	rootCmd.PersistentFlags().BoolP(verboseFlag, "v", false, verboseUsage)
 }

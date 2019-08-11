@@ -10,18 +10,18 @@ import (
 
 // scriptCmd represents the script command
 var scriptsCmd = &cobra.Command{
-	Use:   ScriptCommandFlag,
-	Short: ScriptCommandUsage,
+	Use:   scriptCommandFlag,
+	Short: scriptCommandUsage,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		nxrm.SetConnectionDetails()
-		nxrm.SkipTLSVerification, _ = cmd.Flags().GetBool(SkipTlsFlag)
+		nxrm.SkipTLSVerification, _ = cmd.Flags().GetBool(skipTlsFlag)
 		nxrm.Debug = true
-		nxrm.Verbose, _ = cmd.Flags().GetBool(VerboseFlag)
+		nxrm.Verbose, _ = cmd.Flags().GetBool(verboseFlag)
 	},
 }
 
 var initScriptsCmd = &cobra.Command{
-	Use:   "init",
+	Use:   initTask,
 	Short: "Init Scripts",
 	Run: func(cmd *cobra.Command, args []string) {
 		nxrm.ScriptsInit()
@@ -29,56 +29,56 @@ var initScriptsCmd = &cobra.Command{
 }
 
 var listScriptsCmd = &cobra.Command{
-	Use:   "list",
+	Use:   listTask,
 	Short: "List Scripts",
 	Run: func(cmd *cobra.Command, args []string) {
-		scriptName, _ := cmd.Flags().GetString(ScriptNameFlag)
+		scriptName, _ := cmd.Flags().GetString(scriptNameFlag)
 		nxrm.ListScripts(scriptName)
 	},
 }
 
 var addScriptsCmd = &cobra.Command{
-	Use:   "add",
+	Use:   addTask,
 	Short: "Add Scripts",
 	Run: func(cmd *cobra.Command, args []string) {
-		scriptName, _ := cmd.Flags().GetString(ScriptNameFlag)
+		scriptName, _ := cmd.Flags().GetString(scriptNameFlag)
 		nxrm.AddScript(scriptName)
 	},
 }
 
 var updateScriptsCmd = &cobra.Command{
-	Use:   "update",
+	Use:   updateTask,
 	Short: "Update Scripts",
 	Run: func(cmd *cobra.Command, args []string) {
-		scriptName, _ := cmd.Flags().GetString(ScriptNameFlag)
+		scriptName, _ := cmd.Flags().GetString(scriptNameFlag)
 		nxrm.UpdateScript(scriptName)
 	},
 }
 
 var addOrUpdateScriptsCmd = &cobra.Command{
-	Use:   "add-or-update",
+	Use:   addOrUpdateTask,
 	Short: "Add or Update Scripts",
 	Run: func(cmd *cobra.Command, args []string) {
-		scriptName, _ := cmd.Flags().GetString(ScriptNameFlag)
+		scriptName, _ := cmd.Flags().GetString(scriptNameFlag)
 		nxrm.AddOrUpdateScript(scriptName)
 	},
 }
 
 var deleteScriptsCmd = &cobra.Command{
-	Use:   "delete",
+	Use:   deleteTask,
 	Short: "Delete Scripts",
 	Run: func(cmd *cobra.Command, args []string) {
-		scriptName, _ := cmd.Flags().GetString(ScriptNameFlag)
+		scriptName, _ := cmd.Flags().GetString(scriptNameFlag)
 		nxrm.DeleteScript(scriptName)
 	},
 }
 
 var runScriptsCmd = &cobra.Command{
-	Use:   "run",
+	Use:   runTask,
 	Short: "Run Scripts",
 	Run: func(cmd *cobra.Command, args []string) {
-		scriptName, _ := cmd.Flags().GetString(ScriptNameFlag)
-		payload, _ := cmd.Flags().GetString(ScriptPayloadFlag)
+		scriptName, _ := cmd.Flags().GetString(scriptNameFlag)
+		payload, _ := cmd.Flags().GetString(scriptPayloadFlag)
 		nxrm.RunScript(scriptName, payload)
 	},
 }
@@ -92,6 +92,7 @@ func init() {
 	scriptsCmd.AddCommand(deleteScriptsCmd)
 	scriptsCmd.AddCommand(runScriptsCmd)
 
-	scriptsCmd.PersistentFlags().String(ScriptNameFlag, "", ScriptNameUsage)
-	scriptsCmd.PersistentFlags().String(ScriptPayloadFlag, "", ScriptPayloadUsage)
+	scriptsCmd.PersistentFlags().String(scriptNameFlag, "", scriptNameUsage)
+	_ = scriptsCmd.MarkPersistentFlagRequired(scriptNameFlag)
+	scriptsCmd.PersistentFlags().String(scriptPayloadFlag, "", scriptPayloadUsage)
 }

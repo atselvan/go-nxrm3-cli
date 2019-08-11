@@ -10,13 +10,13 @@ import (
 
 // confCmd represents the configure command
 var confCmd = &cobra.Command{
-	Use:     ConfCommandFlag,
-	Short:   ConfCommandUsage,
+	Use:     confCommandFlag,
+	Short:   confCommandUsage,
 	Example: "./nexus3-repository-cli configure --nexus-url http://nexus-domain --username user --password pass",
 	Run: func(cmd *cobra.Command, args []string) {
-		nexusURL, _ := cmd.Flags().GetString(NexusURLFlag)
-		nexusUser, _ := cmd.Flags().GetString(NexusUsernameFlag)
-		nexusPass, _ := cmd.Flags().GetString(NexusPasswordFlag)
+		nexusURL, _ := cmd.Flags().GetString(nexusURLFlag)
+		nexusUser, _ := cmd.Flags().GetString(nexusUsernameFlag)
+		nexusPass, _ := cmd.Flags().GetString(nexusPasswordFlag)
 		nxrm.NexusURL = nexusURL
 		nxrm.AuthUser = nxrm.AuthUserStruct{Username: nexusUser, Password: nexusPass}
 		nxrm.StoreConnectionDetails()
@@ -24,11 +24,11 @@ var confCmd = &cobra.Command{
 }
 
 func init() {
-	confCmd.Flags().String(NexusURLFlag, "", NexusURLUsage)
-	confCmd.MarkFlagRequired(NexusURLFlag)
-	confCmd.Flags().String(NexusUsernameFlag, "", NexusUsernameUsage)
-	confCmd.MarkFlagRequired(NexusUsernameFlag)
-	confCmd.Flags().String(NexusPasswordFlag, "", NexusPasswordUsage)
-	confCmd.MarkFlagRequired(NexusPasswordFlag)
+	confCmd.Flags().String(nexusURLFlag, "", nexusURLUsage)
+	_ = confCmd.MarkFlagRequired(nexusURLFlag)
+	confCmd.Flags().String(nexusUsernameFlag, "", nexusUsernameUsage)
+	_ = confCmd.MarkFlagRequired(nexusUsernameFlag)
+	confCmd.Flags().String(nexusPasswordFlag, "", nexusPasswordUsage)
+	_ = confCmd.MarkFlagRequired(nexusPasswordFlag)
 	confCmd.Flags().SortFlags = false
 }
