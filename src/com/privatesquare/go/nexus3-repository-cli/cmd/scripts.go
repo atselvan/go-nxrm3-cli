@@ -92,7 +92,22 @@ func init() {
 	scriptsCmd.AddCommand(deleteScriptsCmd)
 	scriptsCmd.AddCommand(runScriptsCmd)
 
-	scriptsCmd.PersistentFlags().String(scriptNameFlag, "", scriptNameUsage)
-	_ = scriptsCmd.MarkPersistentFlagRequired(scriptNameFlag)
-	scriptsCmd.PersistentFlags().String(scriptPayloadFlag, "", scriptPayloadUsage)
+	listScriptsCmd.Flags().String(scriptNameFlag, "", scriptNameUsage)
+
+	addScriptsCmd.Flags().String(scriptNameFlag, "", scriptNameUsage)
+	_= addScriptsCmd.MarkFlagRequired(scriptNameFlag)
+
+	updateScriptsCmd.Flags().String(scriptNameFlag, "", scriptNameUsage)
+	_= updateScriptsCmd.MarkFlagRequired(scriptNameFlag)
+
+	addOrUpdateScriptsCmd.Flags().String(scriptNameFlag, "", scriptNameUsage)
+	_= addOrUpdateScriptsCmd.MarkFlagRequired(scriptNameFlag)
+
+	deleteScriptsCmd.Flags().String(scriptNameFlag, "", scriptNameUsage)
+	_= deleteScriptsCmd.MarkFlagRequired(scriptNameFlag)
+
+	runScriptsCmd.Flags().String(scriptNameFlag, "", scriptNameUsage)
+	_= runScriptsCmd.MarkFlagRequired(scriptNameFlag)
+	runScriptsCmd.Flags().String(scriptPayloadFlag, "", scriptPayloadUsage)
+	_ = runScriptsCmd.MarkFlagRequired(scriptPayloadFlag)
 }
