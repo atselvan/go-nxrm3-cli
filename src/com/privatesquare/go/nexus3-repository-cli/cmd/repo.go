@@ -108,10 +108,10 @@ func init() {
 
 	createRepoCmd.Flags().String(repoNameFlag, "", repoNameUsage)
 	_ = createRepoCmd.MarkFlagRequired(repoNameFlag)
+	createRepoCmd.Flags().String(repoTypeFlag, "", fmt.Sprintf(repoTypeUsage, nxrm.RepoType))
+	_ = createRepoCmd.MarkFlagRequired(repoTypeFlag)
 	createRepoCmd.Flags().String(repoFormatFlag, "", fmt.Sprintf(repoFormatUsage, nxrm.RepoFormats))
 	_ = createRepoCmd.MarkFlagRequired(repoFormatFlag)
-	createRepoCmd.Flags().String(repoTypeFlag, "", fmt.Sprintf(repoTypeUsage, nxrm.RepoFormats))
-	_ = createRepoCmd.MarkFlagRequired(repoTypeFlag)
 	createRepoCmd.Flags().String(remoteURLFlag, "", remoteURLUsage)
 	createRepoCmd.Flags().String(proxyUserFlag, "", proxyUserUsage)
 	createRepoCmd.Flags().String(proxyPassFlag, "", proxyPassUsage)
@@ -134,4 +134,5 @@ func init() {
 	removeMembersCmd.Flags().SortFlags = false
 
 	deleteRepoCmd.Flags().String(repoNameFlag, "", repoNameUsage)
+	_ = deleteRepoCmd.MarkFlagRequired(repoNameFlag)
 }
