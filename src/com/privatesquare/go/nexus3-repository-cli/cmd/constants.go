@@ -2,8 +2,6 @@ package cmd
 
 const (
 
-	// CLI flags and usage
-
 	// sub-commands
 	confCommandFlag       = "configure"
 	confCommandUsage      = "Set nexus connection details"
@@ -53,11 +51,11 @@ const (
 
 	//repo
 	repoNameFlag         = "name"
-	repoNameUsage        = "Nexus repository name (Required)"
+	repoNameUsage        = "Nexus repository name"
 	repoFormatFlag       = "format"
-	repoFormatUsage      = "Repository format. Available formats : %+q (Required)"
+	repoFormatUsage      = "Repository format. Available formats : %+q"
 	repoTypeFlag         = "type"
-	repoTypeUsage        = "Repository Type. Available types : %+q (Required)"
+	repoTypeUsage        = "Repository Type. Available types : %+q"
 	remoteURLFlag        = "remote-url"
 	remoteURLUsage       = "Remote URL to be proxied in nexus"
 	repoMembersFlag      = "members"
@@ -87,8 +85,8 @@ const (
 	privilegeNameUsage = "Privilege name"
 	pSelectorNameFlag  = "selector-name"
 	pRepoNameFlag      = "repo-name"
-	sctionFlag         = "action"
-	sctionUsage        = "Privilege Action. Available actions %+q"
+	actionFlag         = "action"
+	actionUsage        = "Privilege Action. Available actions %+q"
 	privilegeDescUsage = "Privilege description"
 
 	//role
