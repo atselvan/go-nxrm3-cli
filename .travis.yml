@@ -12,7 +12,6 @@ install:
 
 script:
   - go get -v ./...
-  - diff -u <(echo -n) <(gofmt -d .)
-  # Only build binaries from the latest Go release.
+  - cd src/com/privatesquare/go/nexus3-repository-cli/
   - gox -os="linux darwin" -arch="amd64" -output="cli.." -verbose ./...
   - ls -lrt
