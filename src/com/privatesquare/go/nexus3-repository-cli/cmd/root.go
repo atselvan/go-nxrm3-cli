@@ -27,9 +27,15 @@ func Execute() {
 }
 
 func init() {
+
+	cobra.EnableCommandSorting = false
+
 	rootCmd.AddCommand(confCmd)
 	rootCmd.AddCommand(scriptsCmd)
 	rootCmd.AddCommand(repoCmd)
+	rootCmd.AddCommand(selectorCmd)
+	rootCmd.AddCommand(privilegeCmd)
+	rootCmd.AddCommand(roleCmd)
 
 	rootCmd.PersistentFlags().BoolP(skipTlsFlag, "k", false, skipTlsUsage)
 	rootCmd.PersistentFlags().BoolP(debugFlag, "d", false, debugUsage)
