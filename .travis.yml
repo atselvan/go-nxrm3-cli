@@ -16,3 +16,6 @@ script:
   - go get -v ./...
   - gox -os="linux darwin" -arch="amd64" -verbose ./...
   - ls -lrt
+  
+notifications:
+  email: false
