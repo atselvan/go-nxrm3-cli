@@ -1,0 +1,18 @@
+language: go
+
+go:
+  - 1.x
+
+before_install:
+  # gox simplifies building for multiple architectures
+  - go get github.com/mitchellh/gox
+
+install:
+  - # skip
+
+script:
+  - go get -v ./...
+  - diff -u <(echo -n) <(gofmt -d .)
+  # Only build binaries from the latest Go release.
+  - gox -os="linux darwin" -arch="amd64" -output="cli.." -verbose ./...
+  - ls -lrt
