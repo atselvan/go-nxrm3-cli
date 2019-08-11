@@ -64,7 +64,7 @@ var deleteSelectorCmd = &cobra.Command{
 	},
 }
 
-func init(){
+func init() {
 	selectorCmd.AddCommand(listSelectorsCmd)
 	selectorCmd.AddCommand(createSelectorCmd)
 	selectorCmd.AddCommand(updateSelectorCmd)

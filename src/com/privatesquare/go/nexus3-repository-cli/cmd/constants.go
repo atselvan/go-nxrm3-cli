@@ -34,7 +34,7 @@ const (
 
 	descFlag = "description"
 
-	initTask = "init"
+	initTask        = "init"
 	listTask        = "list"
 	createTask      = "create"
 	updateTask      = "update"

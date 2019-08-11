@@ -69,7 +69,7 @@ var deletePrivilegeCmd = &cobra.Command{
 	},
 }
 
-func init(){
+func init() {
 	privilegeCmd.AddCommand(listPrivilegesCmd)
 	privilegeCmd.AddCommand(createPrivilegeCmd)
 	privilegeCmd.AddCommand(updatePrivilegeCmd)

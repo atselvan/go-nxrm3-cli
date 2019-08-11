@@ -95,19 +95,19 @@ func init() {
 	listScriptsCmd.Flags().String(scriptNameFlag, "", scriptNameUsage)
 
 	addScriptsCmd.Flags().String(scriptNameFlag, "", scriptNameUsage)
-	_= addScriptsCmd.MarkFlagRequired(scriptNameFlag)
+	_ = addScriptsCmd.MarkFlagRequired(scriptNameFlag)
 
 	updateScriptsCmd.Flags().String(scriptNameFlag, "", scriptNameUsage)
-	_= updateScriptsCmd.MarkFlagRequired(scriptNameFlag)
+	_ = updateScriptsCmd.MarkFlagRequired(scriptNameFlag)
 
 	addOrUpdateScriptsCmd.Flags().String(scriptNameFlag, "", scriptNameUsage)
-	_= addOrUpdateScriptsCmd.MarkFlagRequired(scriptNameFlag)
+	_ = addOrUpdateScriptsCmd.MarkFlagRequired(scriptNameFlag)
 
 	deleteScriptsCmd.Flags().String(scriptNameFlag, "", scriptNameUsage)
-	_= deleteScriptsCmd.MarkFlagRequired(scriptNameFlag)
+	_ = deleteScriptsCmd.MarkFlagRequired(scriptNameFlag)
 
 	runScriptsCmd.Flags().String(scriptNameFlag, "", scriptNameUsage)
-	_= runScriptsCmd.MarkFlagRequired(scriptNameFlag)
+	_ = runScriptsCmd.MarkFlagRequired(scriptNameFlag)
 	runScriptsCmd.Flags().String(scriptPayloadFlag, "", scriptPayloadUsage)
 	_ = runScriptsCmd.MarkFlagRequired(scriptPayloadFlag)
 }

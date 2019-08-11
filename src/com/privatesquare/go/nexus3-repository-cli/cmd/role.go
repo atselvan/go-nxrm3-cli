@@ -68,7 +68,7 @@ var deleteRoleCmd = &cobra.Command{
 	},
 }
 
-func init(){
+func init() {
 	roleCmd.AddCommand(listRolesCmd)
 	roleCmd.AddCommand(createRoleCmd)
 	roleCmd.AddCommand(updateRoleCmd)
