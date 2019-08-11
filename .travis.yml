@@ -12,6 +12,7 @@ install:
 
 script:
   - export GOPATH=$(pwd)
+  - cd src/com/privatesquare/go/nexus3-repository-cli/
   - go get -v ./...
   - gox -os="linux darwin" -arch="amd64" -output="cli.." -verbose ./...
   - ls -lrt
