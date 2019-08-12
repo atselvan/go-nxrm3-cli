@@ -1,125 +1,111 @@
 # Nexus3 Repository CLI
 
-This CLI is intended to automate the processes around Sonatype Nexus 3 Repository Manager.
+[![Build Status](https://travis-ci.org/atselvan/go-nxrm3-cli.svg?branch=master)](https://travis-ci.org/atselvan/go-nxrm3-cli)
+[![Go Report Card](https://goreportcard.com/badge/github.com/atselvan/go-nxrm3-cli)](https://goreportcard.com/report/github.com/atselvan/go-nxrm3-cli)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+A easy to use CLI written in golang which is intended to automate all the processes around Sonatype Nexus 3 Repository 
+Manager. The CLI is built using 
+
+## Required Libraries
+
+[atselvan/go-nxrm-lib](https://github.com/atselvan/go-nxrm-lib)
+
+Package go-nxrm-lib implements functions to call Nexus repository manager 3 and provision resources in nexus using the Integration API of nexus (scripts API)
+
+[spf13/cobra](https://github.com/spf13/cobra)
+
+Cobra is both a library for creating powerful modern CLI applications as well as a program to generate applications and command files.
+
+## Features
+
+* Add, List, Update, Delete Scripts
+* Create, List and Delete Hosted, Proxy and group repositories in Nexus
+* Add or Remove members to/from an existing group repository
+* Create, List, Update and Delete Content selectors
+* Create, List, Update and Delete repository content selector privileges
+* Create, List, Update and Delete roles
+* Add or Remove role members or privileges to/from an existing role
 
 ## Building the CLI
 
-```console
-export GOPATH=$(pwd) <From the root of the repository>
+```bash
+# From the root of the repository
+export GOPATH=$(pwd)
+
+# From the directory containing the main.go file
+go get ./...
 go build
 ```
 
-## Using the CLI
+For building the cli for multiple distributions checkout [mitchellh/gox](https://github.com/mitchellh/gox)
 
-```console
-Usage: nexus3-repository-cli [command]
+## Configuration
 
-[commands]
-  configure	Set nexus connection details
-  script  	Nexus script operations
-  repo  	Nexus repository operations
+```cmd
+./nexus3-repository-cli configure --nexus-url http://localhost:8081 --username admin --password admin
+
+2019/08/12 21:43:28 Connection details were stored successfully in the file ./nexus3-repository-cli.json
 ```
 
-### configure sub-command
+The connection details are saved in a file parallel to the CLI. Once you are done with your commands make sure to 
+delete the credentials.
 
-```console
-Usage: nexus3-repository-cli configure [args]
+## Examples
 
-[args]
+### Creating a repository
 
-  -nexus-url string
-    	Nexus 3 server URL. (Required)
-  -password string
-    	Nexus 3 server login password. (Required)
-  -username string
-    	Nexus 3 server login user. (Required)
+```cmd
+./nexus3-repository-cli repo create --name Releases --type hosted --format maven --releases
+
+2019/08/12 21:45:40 Repository "Releases" was created in nexus
+```
+### Listing roles
+
+```cmd
+./nexus3-repository-cli role list
+
+nx-anonymous
+nx-admin
+2019/08/12 21:46:38 Number of roles in nexus : 2
+
+./nexus3-repository-cli role list --id nx-admin
+
+Role Details:
+ID: nx-admin
+Name: 
+Description: Administrator Role
+Source: default
+Roles: []
+Privileges: [nx-all]
 ```
 
-**Example:**
+## Help
 
-```console
-nexus3-repository-cli configure -nexus-url http://localhost:8081 -username admin -password admin123
-```
+```cmd
+./nexus3-repository-cli -h
 
-### script sub-command
+CLI to interacts with Nexus repository Manager 3
+via its API to administer the instance and to create nxrm components
 
-```console
-Usage: nexus3-repository-cli script [args] [options]
+Usage:
+  nexus3-repository-cli [command]
 
-[args]
+Available Commands:
+  configure   Set nexus connection details
+  scripts     Nexus script operations
+  repo        Nexus repository operations
+  selector    Nexus content selector operations
+  privilege   Nexus privilege operations
+  role        Nexus role operations
+  help        Help about any command
 
-  -task string	Script Task (Required)  (For all tasks the script(s) should exist under the path ./scripts/groovy)
+Flags:
+  -d, --debug      Set Default for more information on the nexus script execution
+  -h, --help       help for nexus3-repository-cli
+  -k, --skip-tls   Skip TLS verification for the nexus server instance
+  -v, --verbose    Set Verbose for detailed http request and response logs
 
-    list 	    List all the scripts available in Nexus. script-name (Optional) If script-name is passed the contents of the script will be printed
-    add  	    Add a new script to nexus. script-name (Required)
-    update 	    Update a script that is available in nexus. script-name (Required)
-    add-or-update   Add or Update a script in nexus. script-name (Required)
-    delete          Delete a script from nexus. script-name (Required)
-    run 	    Run/Execute a script in nexus. Required Parameter: script-name
-
-  -script-name string
-	Name of the script to be executed in nexus. The script should exist under the path ./scripts/groovy
-  -payload string
-	Arguments to be passed to a nexus script can be sent as a payload during script execution
-
-[options]
-
-  -skip-tls
-	Skip TLS verification for the nexus server instance
-  -debug
-	Set Default for more information on the nexus script execution
-  -verbose
-	Set Verbose for detailed http request and response logs
-```
-
-### repo sub-command
-
-```console
-Usage: nexus3-repository-cli repo [args] [options]
-
-[args]
-
-  -task string	Repo Task (Required)
-
-    list   		List all the repositories in nexus.
-			(Optional - repo-name) If repo-name is passed the list command will get the details of the repository.
-			(Optional - repo-format) If repo-format is passed the list command will list the repositories as per the format
-    create-hosted	Create a hosted repository in nexus. (Required - repo-name and repo-format)
-    create-proxy	Create a proxy repository in nexus. (Required - repo-name, repo-format and remote-url ) (Optional - proxy-user and proxy-pass)
-    create-group	Create a group repository in nexus. (Required - repo-name,repo-format and repo-members)
-    add-group-members	Add new members to a existing group repository. (Required - repo-name,repo-format and repo-members)
-    delete		Delete a repository from nexus
-
-    If you are creating a docker repository it is necessary to also provide either a docker-http-port or a docker-https-port or both.
-
-  -repo-name string
-	Nexus repository name
-  -repo-format string
-	Repository format. Available formats : ["maven" "npm" "nuget" "bower" "pypi" "raw" "rubygems" "yum" "docker"]
-  -remote-url string
-	Remote URL to be proxied in nexus
-  -repo-members string
-	Comma-separated repository names that should be added to a group repo
-  -proxy-user string
-	Username for accessing the proxy repository
-  -proxy-pass string
-	Password for accessing the proxy repository
-  -docker-http-port string
-	Docker HTTP port
-  -docker-https-port string
-	Docker HTTPs port
-  -blob-store-name string
-	Blob store name
-  -releases string
-	Set this flag to create a releases repository
-  
-[options]
-
-  -skip-tls
-	Skip TLS verification for the nexus server instance
-  -debug
-	Set Default for more information on the nexus script execution
-  -verbose
-	Set Verbose for detailed http request and response logs
+Use "nexus3-repository-cli [command] --help" for more information about a command.
 
 ```
