@@ -9,6 +9,12 @@ before_install:
 
 install:
   - # skip
+  
+addons:
+  sonarcloud:
+    organization: "atselvan"
+    token:
+      secure: "WKshGsXMIc0m5WHX+KgqVEo399r+4lAcUdjzp7twgkJewgtNFT6pwJR1l5o7fHabqZ64TLY7kV3rCEDmhxCvujIE2tYAA+hxvccq6+7R60Q88wStgAwkr0ol2HOwCs9LfJPEJyV021ry12bAWavI/8or7tOhKOaikfp5JJ+kcoL4GR3TI7BU0vcihcIRmfK+tfG99vQ0KD9GZ1N1FeGNx/mAbRV0G1mmsCjsOP5Fq0EZ+kbt6EVhcccoj3vnahKhfcYtoXy4m4Ny7PwZ9Jno1tjN0NQrIWkZlQiJN1YD6fco1+oYZAnAUBm3KQ6w4crcHXnBHv5XlrJtd44Z5KYIxgEd+pyuMl9Foh9DLgdzPvLScHxnjmxGHQJmtXoWgB+8skJVihEGsxASKG/oX+BRODHvohRdVisDp662oe35D9bjgkFDI0QEE1WzLL3v8Fph/BraG0Ly0RfEjp8H8kIWkdDuKy8acQ0y/dCQ3pvR0UndBCEscHr3z5x2SzYJshmrO4vYKvh35kzLzNH9BqLvzt/vqDnW40kQ3cDUUO/QsWX2xS6TS6No9AhXCAHbKXHwUN2ZCU+17/IxgRwNRJYRBqw44kxYV/9K/48UNt1bhKHvn6dUu6AlNrXgINk5eXOWKG3eK+a467bmGbFOBiAoX93sgZjP1RDSBrichjD1jGg="
 
 script:
   - export GOPATH=$(pwd)
@@ -16,6 +22,7 @@ script:
   - go get -v ./...
   - gox -os="linux darwin" -arch="amd64" -verbose ./...
   - ls -lrt
+  - sonar-scanner
   
 notifications:
   email: false
