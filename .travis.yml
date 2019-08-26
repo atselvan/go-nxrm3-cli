@@ -1,4 +1,4 @@
-language: go
+dist: trusty
 
 go:
   - 1.12.5
@@ -22,7 +22,7 @@ script:
   - go get -v ./...
   - gox -os="linux darwin" -arch="amd64" -verbose ./...
   - ls -lrt
-  - sonar-scanner -Dproject.settings=./sonar-project.properties
+  - sonar-scanner
   
 notifications:
   email: false
