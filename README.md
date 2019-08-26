@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/atselvan/go-nxrm3-cli.svg?branch=master)](https://travis-ci.org/atselvan/go-nxrm3-cli)
 [![Go Report Card](https://goreportcard.com/badge/github.com/atselvan/go-nxrm3-cli)](https://goreportcard.com/report/github.com/atselvan/go-nxrm3-cli)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=io.sonarcloud.examples.go-sqscanner-travis-project&metric=alert_status)](https://sonarcloud.io/dashboard/index/atselvan:go-nxrm3-cli)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A easy to use CLI written in golang which is intended to automate all the processes around Sonatype Nexus 3 Repository 
