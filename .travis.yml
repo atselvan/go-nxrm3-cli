@@ -14,7 +14,7 @@ addons:
   sonarcloud:
     organization: "atselvan"
     token:
-      secure: "WKshGsXMIc0m5WHX+KgqVEo399r+4lAcUdjzp7twgkJewgtNFT6pwJR1l5o7fHabqZ64TLY7kV3rCEDmhxCvujIE2tYAA+hxvccq6+7R60Q88wStgAwkr0ol2HOwCs9LfJPEJyV021ry12bAWavI/8or7tOhKOaikfp5JJ+kcoL4GR3TI7BU0vcihcIRmfK+tfG99vQ0KD9GZ1N1FeGNx/mAbRV0G1mmsCjsOP5Fq0EZ+kbt6EVhcccoj3vnahKhfcYtoXy4m4Ny7PwZ9Jno1tjN0NQrIWkZlQiJN1YD6fco1+oYZAnAUBm3KQ6w4crcHXnBHv5XlrJtd44Z5KYIxgEd+pyuMl9Foh9DLgdzPvLScHxnjmxGHQJmtXoWgB+8skJVihEGsxASKG/oX+BRODHvohRdVisDp662oe35D9bjgkFDI0QEE1WzLL3v8Fph/BraG0Ly0RfEjp8H8kIWkdDuKy8acQ0y/dCQ3pvR0UndBCEscHr3z5x2SzYJshmrO4vYKvh35kzLzNH9BqLvzt/vqDnW40kQ3cDUUO/QsWX2xS6TS6No9AhXCAHbKXHwUN2ZCU+17/IxgRwNRJYRBqw44kxYV/9K/48UNt1bhKHvn6dUu6AlNrXgINk5eXOWKG3eK+a467bmGbFOBiAoX93sgZjP1RDSBrichjD1jGg="
+      secure: "ll3CnSUgYoOTo6T5iiB//Pw631mRxNYYiaBR4V8Mp6BFesIue4IRI3OCoFJ/YLH7NeehLmx11Fet4MuyyJcn56Woay0b+C4Ljp400SO/f7iEj5lRiVpjlRySJYR6QbY92D3MhYnN3ZuVCinTZylAUx3UN+O8sWuyQI4t492YDYdq48C1G64yXLa77nRdU6PHW/DK5MmsVcOjzEM53wiDpUh7zWY+UM2ZyK9LH/6qXPV2ukHG7c6SEGXuQyOmAVv6PrrI5HpyKxTZdjWWvVxjLnbJSgkKl/H2sjG+a3KoI6v20wvRtkMsdhDA/us7jmupdTyfdFl/Yzj4+l4H0+V6iNzAUzbo363YHwXNU5hK7LJ4GmmWQ5J2k8dX0zj63NBb/sGmewcnz690y/VLRHwFtnuR9VScIr6a7yNHSmqYcDG2P5EtK7PGxpcgb+6slFxLBTnNLijFpZsovvkuK/qnFSpLuOK7nd2jzJtrIBR/VSBae1nhvlV3Cjdyu38C1y/CjLrTcPFuLSQmazdDsVE2YaNXpc4xPcQ5vcfy+F3A6Ateu2Y1hNdoJxcjiZ+0Qdl2vShOgKpJMQAHiOrjtSx/n09LX1wKvlJzn+YvrMcOVJwQNqiGcA32vFVF/oVY4V+HSHCkjRs0z6SDSii5XRFFM+mAuiMe96qEAVVzCJPAKU8="
 
 script:
   - export GOPATH=$(pwd)
@@ -22,7 +22,7 @@ script:
   - go get -v ./...
   - gox -os="linux darwin" -arch="amd64" -verbose ./...
   - ls -lrt
-  - sonar-scanner
+  - sonar-scanner -X
   
 notifications:
   email: false
