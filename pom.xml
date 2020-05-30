@@ -9,7 +9,7 @@
   <version>1.0.0-SNAPSHOT</version>
  
   <properties>
-    <nx-version>3.15.1-01</nx-version>
+    <nx-version>3.22.0-02</nx-version>
   </properties>
   <dependencies>
     <dependency>
