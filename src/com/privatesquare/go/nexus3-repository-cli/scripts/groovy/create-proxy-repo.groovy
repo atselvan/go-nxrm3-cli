@@ -4,13 +4,15 @@
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 // import Nexus Configuration function from nexus-repository jar file
-import  org.sonatype.nexus.repository.config.Configuration
+import org.sonatype.nexus.repository.manager.RepositoryManager
+
+// Get the RepositoryManager, then use it to get a new configuration
+def repoManager = container.lookup(RepositoryManager.class.name)
 
 // input map
 Map input = new JsonSlurper().parseText(args)
 // output map
 Map output = [:]
-Configuration configuration
 
 // reference : https://help.sonatype.com/repomanager3/configuration/repository-management
 
@@ -29,9 +31,7 @@ Map storageConfig = [
 ]
 
 // cleanup configuration
-Map cleanUpConfig = [
-        'policyName': 'None'
-]
+Map cleanUpConfig = [:]
 
 // docker configuration
 Map dockerConfig = [
@@ -83,7 +83,7 @@ Map negetiveCacheConfig = [
 
 // check if repository does not exist before creating
 if (!repository.getRepositoryManager().exists(input.name)){
-    configuration = new Configuration()
+    configuration = repoManager.newConfiguration()
 
     if (input.format == 'maven2'){
         configuration.setAttributes(
